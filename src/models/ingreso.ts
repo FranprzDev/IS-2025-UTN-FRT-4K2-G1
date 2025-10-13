@@ -1,9 +1,9 @@
-import { Paciente } from "./paciente";
-import { Enfermera } from "./enfermera";
-import { NivelEmergencia } from "./nivelEmergencia";
-import { TensionArterial } from "./valueobjects/tensionArterial";
-import { FrecuenciaCardiaca } from "./valueobjects/frecuenciaCardiaca";
-import { FrecuenciaRespiratoria } from "./valueobjects/frecuenciaRespiratoria";
+import { Paciente } from "./paciente.js";
+import { Enfermera } from "./enfermera.js";
+import { NivelEmergencia } from "./nivelEmergencia.js";
+import { TensionArterial } from "./valueobjects/tensionArterial.js";
+import { FrecuenciaCardiaca } from "./valueobjects/frecuenciaCardiaca.js";
+import { FrecuenciaRespiratoria } from "./valueobjects/frecuenciaRespiratoria.js";
 
 interface IngresoArgs {
   paciente: Paciente;

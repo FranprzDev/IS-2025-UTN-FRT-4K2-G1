@@ -2,23 +2,32 @@
   "name": "clinicaemergencia2025bddts",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test:cucumber": "cucumber-js --require-module ts-node/register --require-module tsconfig-paths/register --require 'test/features/step_definitions/**/*.ts' 'test/features/**/*.feature'",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "dev": "tsx server.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
   "devDependencies": {
     "@cucumber/cucumber": "^12.2.0",
     "@types/chai": "^5.2.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/node": "^24.7.2",
     "chai": "^6.2.0",
     "eslint": "^9.37.0",
     "prettier": "3.6.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }

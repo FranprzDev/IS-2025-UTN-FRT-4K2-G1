@@ -1,4 +1,4 @@
-import { Frecuencia } from "./frecuencia";
+import { Frecuencia } from "./frecuencia.js";
 
 export class FrecuenciaSistolica extends Frecuencia {
   public constructor(valor: number) {

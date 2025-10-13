@@ -1,7 +1,7 @@
-import { RepoPacientes } from "../interface/repoPacientes";
-import { Ingreso } from "../../models/ingreso";
-import { Enfermera } from "../../models/enfermera";
-import { NivelEmergencia } from "../../models/nivelEmergencia";
+import { RepoPacientes } from "../interface/repoPacientes.js";
+import { Ingreso } from "../../models/ingreso.js";
+import { Enfermera } from "../../models/enfermera.js";
+import { NivelEmergencia } from "../../models/nivelEmergencia.js";
 
 interface RegistrarUrgenciaArgs {
   cuil: string;

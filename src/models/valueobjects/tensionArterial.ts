@@ -1,5 +1,5 @@
-import { FrecuenciaDiastolica } from "./frecuenciaDiastolica";
-import { FrecuenciaSistolica } from "./frecuenciaSistolica";
+import { FrecuenciaDiastolica } from "./frecuenciaDiastolica.js";
+import { FrecuenciaSistolica } from "./frecuenciaSistolica.js";
 
 export class TensionArterial {
   sistolica: FrecuenciaSistolica;
