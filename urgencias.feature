@@ -4,9 +4,8 @@ Feature: Registro de admisiones en el módulo de urgencias
   Para determinar qué pacientes tienen mayor prioridad de atención
 
   Contexto del dominio:
-  - Campos obligatorios: fechaIngreso, informe, nivelEmergencia, frecuenciaCardiaca, frecuenciaRespiratoria, tensionArterial
-  - Niveles de emergencia (orden de prioridad): Crítica > Emergencia > Urgencia > Menor
-  - Estados del paciente: PENDIENTE, EN_ATENCION, ATENDIDO, DERIVADO
+  - Campos obligatorios: Cuil, informe, nivelEmergencia, temperatura, frecuenciaCardiaca, frecuenciaRespiratoria, tensionArterial
+  - Niveles de emergencia (orden de prioridad): Crítica > Emergencia > Urgencia > Urgencia Menor > Sin Urgencia
 
 Background:
   Given que la siguiente enfermera esta registrada:
@@ -18,10 +17,9 @@ Scenario: Registrar ingreso de un paciente existente con todos los datos obligat
   Given que el siguiente paciente esta registrado
   |Cuil         |Apellido|Nombre |Obra Social|
   |23-44920883-9|Posse   |Gonzalo|Osde       |
-  And que la enfermera ingresa todos los datos obligatorios correctamente: 
-  | Cuil            | informe             | nivelEmergencia | estado    | temperatura | frecuenciaCardiaca | frecuenciaRespiratoria | tensionArterial |
-  | 23-44920883-9   | "Dolor en el pecho" | "Crítica"       | PENDIENTE | 38.2        | 90                 | 20                     | 120/80          |
-  When la enfermera registra la admisión
+  When Ingresan a urgencias los siguientes pacientes:
+    |Cuil         |Informe       |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+    |23-44920883-9|Tiene vomito  |Emergencia         |38         |70                   |15                      |120/80          |
   Then el sistema guarda el ingreso del paciente
   And el paciente entra en la cola de atención con estado "PENDIENTE"
 
@@ -29,7 +27,7 @@ Scenario: Registrar ingreso de un paciente no existente en el sistema
   Given que el paciente no existe en el sistema
   When Ingresan a urgencias los siguientes pacientes:
     |Cuil         |Informe       |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
-    |23-44920883-9|Tiene vomito  |Emergencia         |38         |                   |15                      |120/80          |
+    |23-44920883-9|Tiene vomito  |Emergencia         |38         |70                 |15                      |120/80          |
   Then el sistema muestra el siguiente mensaje: "El paciente debe ser registrado anteriormente."
   And el sistema redirige a la pantalla de creación de pacientes.
 
