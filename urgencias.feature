@@ -27,11 +27,9 @@ Scenario: Registrar ingreso de un paciente existente con todos los datos obligat
 
 Scenario: Registrar ingreso de un paciente no existente en el sistema
   Given que el paciente no existe en el sistema
-  When Ingresan a urgencias los siguientes pacientes:
-    |Cuil         |Informe       |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
-    |23-44920883-9|Tiene vomito  |Emergencia         |38         |                   |15                      |120/80          |
-  Then el sistema muestra el siguiente mensaje: "El paciente debe ser registrado anteriormente."
-  And el sistema redirige a la pantalla de creación de pacientes.
+  When la enfermera intenta registrar la admisión
+  Then el sistema muestra un mensaje indicando que el paciente debe ser creado primero
+  And el sistema redirige a la pantalla de creación de pacientes
 
 Scenario Outline: Registrar ingreso con dato obligatorio faltante
   Given que el siguiente paciente esta registrado
