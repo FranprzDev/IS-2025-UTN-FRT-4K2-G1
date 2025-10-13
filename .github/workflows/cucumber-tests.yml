@@ -1,7 +1,7 @@
 name: Cucumber Tests
 
 on:
-  workflow_dispatch:  # Manual trigger only
+  workflow_dispatch:
 
 jobs:
   test:

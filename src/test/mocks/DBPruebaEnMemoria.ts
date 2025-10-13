@@ -1,5 +1,5 @@
-import { Paciente } from "../../models/paciente";
-import { RepoPacientes } from "../../app/interface/repoPacientes";
+import { Paciente } from "../../models/paciente.js";
+import { RepoPacientes } from "../../app/interface/repoPacientes.js";
 
 export class DBPruebaEnMemoria implements RepoPacientes {
   private pacientes: Map<string, Paciente> = new Map();
