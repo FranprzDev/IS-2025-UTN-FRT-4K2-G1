@@ -9,14 +9,18 @@ Feature: Registro de admisiones en el módulo de urgencias
   - Estados del paciente: PENDIENTE, EN_ATENCION, ATENDIDO, DERIVADO
 
 Background:
-  Given que la enfermera está autenticada en el sistema
+  Given que la siguiente enfermera esta registrada:
+  |Nombre   |Apellido|
+  |Florencia|   Perez|
   And que el módulo de urgencias está disponible
 
 Scenario: Registrar ingreso de un paciente existente con todos los datos obligatorios
-  Given que existe un paciente identificado en el sistema
-  And que la enfermera ingresa todos los datos obligatorios correctamente
-  | fechaIngreso | informe | nivelEmergencia | estado | temperatura | frecuenciaCardiaca | frecuenciaRespiratoria | tensionArterial |
-  | 07/10/2025 | "Dolor en el pecho" | "Crítica" | PENDIENTE | 38.2 | 90 | 20 | 120/80 |
+  Given que el siguiente paciente esta registrado
+  |Cuil         |Apellido|Nombre |Obra Social|
+  |23-44920883-9|Posse   |Gonzalo|Osde       |
+  And que la enfermera ingresa todos los datos obligatorios correctamente: 
+  | Cuil            | informe             | nivelEmergencia | estado    | temperatura | frecuenciaCardiaca | frecuenciaRespiratoria | tensionArterial |
+  | 23-44920883-9   | "Dolor en el pecho" | "Crítica"       | PENDIENTE | 38.2        | 90                 | 20                     | 120/80          |
   When la enfermera registra la admisión
   Then el sistema guarda el ingreso del paciente
   And el paciente entra en la cola de atención con estado "PENDIENTE"
@@ -28,77 +32,126 @@ Scenario: Registrar ingreso de un paciente no existente en el sistema
   And el sistema redirige a la pantalla de creación de pacientes
 
 Scenario Outline: Registrar ingreso con dato obligatorio faltante
-  Given que el paciente existe en el sistema
+  Given que el siguiente paciente esta registrado
+  |Cuil         |Apellido|Nombre |Obra Social|
+  |23-44920883-9|Posse   |Gonzalo|Osde       |
   And que la enfermera omite el dato "<campo>"
-  When intenta registrar la admisión
-  Then el sistema muestra un mensaje de error indicando que falta el dato "<campo>"
+
+  When Ingresan a urgencias los siguientes pacientes:
+    |Cuil         |Informe       |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+    |23-44920883-9|Tiene vomito  |Emergencia         |38         |                   |15                      |120/80          |
+  
+  Then el sistema muestra el siguiente error: "El campo "<campo>" debe estar completo"
 
   Examples:
-  | campo                 |
-  | informe               |
-  | nivel de emergencia   |
-  | frecuencia cardíaca   |
+  | campo                   |
+  | informe                 |
+  | nivel de emergencia     |
+  | frecuencia cardíaca     |
   | frecuencia respiratoria |
-  | tensión arterial      |
+  | tensión arterial        |
 
 Scenario Outline: Registrar ingreso con valores negativos en frecuencias
-  Given que el paciente existe en el sistema
+  Given que el siguiente paciente esta registrado
+  |Cuil         |Apellido|Nombre   |Obra Social          |
+  |23-44190234-4|Perez   |Francisco|Subsidio salud       |
   And que la enfermera ingresa un valor negativo en "<campo_frecuencia>"
-  And que ingresa "-5" como valor
-  When intenta registrar la admisión
-  Then el sistema muestra un mensaje de error indicando que los valores de frecuencia no pueden ser negativos
+ 
+  When Ingresan a urgencias los siguientes pacientes:
+    |Cuil         |Informe       |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+    |23-44190234-4|Tiene vomito  |Emergencia         |38         |-70                 |15                      |120/80         |
+  Then el sistema muestra el siguiente error: "La "<campo_frecuencia>" no puede ser negativa"
 
   Examples:
-  | campo_frecuencia     |
-  | frecuencia cardíaca  |
+  | campo_frecuencia        |
+  | frecuencia cardíaca     |
   | frecuencia respiratoria |
 
-Scenario Outline: Registrar ingreso con valores fuera de rango médico
-  Given que el paciente existe en el sistema
-  And que la enfermera ingresa "<valor>" en "<campo>"
-  When intenta registrar la admisión
-  Then el sistema muestra un mensaje de error indicando que "<campo>" está fuera del rango válido
+Scenario Outline: Registrar ingreso con valores de temperatura fuera de rango médico
+  Given que el siguiente paciente esta registrado
+  |Cuil         |Apellido|Nombre   |Obra Social          |
+  |23-44190234-4|Perez   |Francisco|Subsidio salud       |
+  
+  When Ingresan a urgencias los siguientes pacientes:
+    |Cuil         |Informe       |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+    |23-44190234-4|Tiene vomito  |Emergencia         |50         |60                 |  15                    |120/80          |
+  Then el sistema muestra el siguiente error: "La temperatura se encuentra fuera de rango"
 
-  Examples:
-  | campo | valor | rango |
-  | temperatura | 25.0 | 35.0-42.0°C |
-  | temperatura | 50.0 | 35.0-42.0°C |
-  | frecuencia cardíaca | 300 | 40-200 lpm |
-  | frecuencia respiratoria | 5 | 8-60 rpm |
-  | tensión arterial | 300/200 | 90/60-180/120 mmHg |
+Scenario Outline: Registrar ingreso con valores de frecuencia cardíaca fuera de rango médico
+  Given que el siguiente paciente esta registrado
+  |Cuil         |Apellido|Nombre   |Obra Social          |
+  |23-44190234-4|Perez   |Francisco|Subsidio salud       |
+  
+  When Ingresan a urgencias los siguientes pacientes:
+    |Cuil         |Informe       |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+    |23-44190234-4|Tiene vomito  |Emergencia         |37         |10                 |  15                    |120/80          |
+  Then el sistema muestra el siguiente error: "La frecuencia cardíaca se encuentra fuera de rango"
 
-Scenario: Registrar ingreso con fecha futura
-  Given que el paciente existe en el sistema
-  And que la enfermera ingresa una fecha futura "15/12/2025"
-  When intenta registrar la admisión
-  Then el sistema muestra un mensaje de error indicando que la fecha no puede ser futura
+Scenario Outline: Registrar ingreso con valores de frecuencia respiratoria fuera de rango médico
+  Given que el siguiente paciente esta registrado
+  |Cuil         |Apellido|Nombre   |Obra Social          |
+  |23-44190234-4|Perez   |Francisco|Subsidio salud       |
+  
+  When Ingresan a urgencias los siguientes pacientes:
+    |Cuil         |Informe       |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+    |23-44190234-4|Tiene vomito  |Emergencia         |37         |80                 |  120                    |120/80          |
+  Then el sistema muestra el siguiente error: "La frecuencia respiratoria se encuentra fuera de rango"
+
+Scenario Outline: Registrar ingreso con valores de tensión arterial fuera de rango médico
+  Given que el siguiente paciente esta registrado
+  |Cuil         |Apellido|Nombre   |Obra Social          |
+  |23-44190234-4|Perez   |Francisco|Subsidio salud       |
+  
+  When Ingresan a urgencias los siguientes pacientes:
+    |Cuil         |Informe       |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+    |23-44190234-4|Tiene vomito  |Emergencia         |37         |80                 | 15                     |200/160         |
+  Then el sistema muestra el siguiente error: "La tensión arterial se encuentra fuera de rango"
 
 Scenario: Ingreso de paciente con mayor nivel de emergencia
-  Given que hay un paciente B en espera con nivel de emergencia "Urgencia"
-  And que la enfermera registra un nuevo paciente A con nivel de emergencia "Crítica"
-  When ambos pacientes están en la lista de espera
-  Then el sistema debe atender primero al paciente A antes que al paciente B
-
-Scenario: Ingreso de paciente con menor nivel de emergencia
-  Given que hay un paciente B en espera con nivel de emergencia "Crítica"
-  And que la enfermera registra un nuevo paciente A con nivel de emergencia "Urgencia"
-  When ambos pacientes están en la lista de espera
-  Then el sistema debe atender primero al paciente B antes que al paciente A
+  Given que estan registrados los siguientes pacientes:
+      |Cuil         |Apellido      |Nombre   | Obra Social      |
+      |23-44190234-4|Perez         |Francisco|Subsidio salud    |
+      |23-44920883-4|Posse         |Gonzalo  |Osde              |
+      |23-45985689-2|Parada Parejas|Manuel   |Sancor salud      |
+    When Ingresan a urgencias los siguientes pacientes:
+      |Cuil         |Informe         |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+      |23-44190234-4|Le duele el ojo |Sin Urgencia       |37         |70                 |15                      |120/80          |
+      |23-44920883-4|Le agarro dengue|Emergencia         |38         |70                 |15                      |120/80          |
+    Then La lista de espera esta ordenada por cuil de la siguiente manera:
+      |Cuil         |
+      |23-44920883-4|
+      |23-44190234-4|
 
 Scenario: Ingreso de paciente con el mismo nivel de emergencia
-  Given que hay un paciente B en espera con nivel de emergencia "Urgencia"
-  And que la enfermera registra un nuevo paciente A con nivel de emergencia "Urgencia"
-  And que el paciente B ingresó antes al sistema
-  When ambos pacientes están en la lista de espera
-  Then el sistema debe atender primero al paciente B por orden de llegada
+  Given que estan registrados los siguientes pacientes:
+      |Cuil         |Apellido      |Nombre   | Obra Social      |
+      |23-44190234-4|Perez         |Francisco|Subsidio salud    |
+      |23-44920883-4|Posse         |Gonzalo  |Osde              |
+      |23-45985689-2|Parada Parejas|Manuel   |Sancor salud      |
+    When Ingresan a urgencias los siguientes pacientes:
+      |Cuil         |Informe         |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+      |23-45985689-2|le agarro dengue|Emergencia         |38         |75                 |14                      |120/81          |              
+      |23-44190234-4|Le duele el ojo |Sin Urgencia       |37         |70                 |15                      |120/80          |
+      |23-44920883-4|Le agarro dengue|Emergencia         |38         |70                 |15                      |120/80          |
+    Then La lista de espera esta ordenada por cuil de la siguiente manera:
+      |Cuil         |
+      |23-45985689-2|
+      |23-44920883-4|
+      |23-44190234-4|
 
 Scenario: Paciente con múltiples niveles de prioridad en cola
-  Given que hay pacientes en espera con diferentes niveles de emergencia:
-  | paciente | nivel | tiempoEspera |
-  | C | "Menor" | 2 horas |
-  | B | "Urgencia" | 30 minutos |
-  | A | "Crítica" | 5 minutos |
-  When se atiende al siguiente paciente
-  Then el sistema debe atender primero al paciente A (Crítica)
-  And luego al paciente B (Urgencia)
-  And finalmente al paciente C (Menor)
+  Given que estan registrados los siguientes pacientes:
+      |Cuil         |Apellido      |Nombre   | Obra Social      |
+      |23-44190234-4|Perez         |Francisco|Subsidio salud    |
+      |23-44920883-4|Posse         |Gonzalo  |Osde              |
+      |23-45985689-2|Parada Parejas|Manuel   |Sancor salud      |
+  When Ingresan a urgencias los siguientes pacientes:
+  |Cuil         |Informe         |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca| Frecuencia Respiratoria|Tension Arterial|
+      |23-45985689-2|le agarro dengue|Urgencia           |38         |75                 |14                      |120/81          |              
+      |23-44190234-4|Le duele el ojo |Sin Urgencia       |37         |70                 |15                      |120/80          |
+      |23-44920883-4|Le agarro dengue|Emergencia         |38         |70                 |15                      |120/80          |
+  Then La lista de espera esta ordenada por cuil de la siguiente manera:
+      |Cuil         |
+      |23-45985689-2|
+      |23-44920883-4|
+      |23-44190234-4|
