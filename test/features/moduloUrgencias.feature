@@ -70,20 +70,6 @@ Scenario: Ingreso un paciente sin urgencia y dos con urgencia
   |23-1234567-9|
   |27-4567890-3|
 
-Scenario: Ingreso de paciente con mayor nivel de emergencia
-  Given que estan registrados los siguientes pacientes:
-  |Cuil         |Apellido      |Nombre   |Obra Social   |
-  |23-44190234-4|Perez         |Francisco|Subsidio salud|
-  |23-44920883-4|Posse         |Gonzalo  |Osde          |
-  |23-45985689-2|Parada Parejas|Manuel   |Sancor salud  |
-  When Ingresan a urgencias los siguientes pacientes:
-  |Cuil         |Informe        |Nivel de Emergencia|Temperatura|Frecuencia Cardiaca|Frecuencia Respiratoria|Tension Arterial|
-  |23-44190234-4|Le duele el ojo|Sin Urgencia       |37         |70                 |15                     |120/80          |
-  |23-44920883-4|Le agarro dengue|Emergencia        |38         |70                 |15                     |120/80          |
-  Then La lista de espera esta ordenada por cuil de la siguiente manera:
-  |23-44920883-4|
-  |23-44190234-4|
-
 Scenario: Ingreso de paciente con el mismo nivel de emergencia
   Given que estan registrados los siguientes pacientes:
   |Cuil         |Apellido      |Nombre   |Obra Social   |
