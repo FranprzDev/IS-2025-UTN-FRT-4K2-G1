@@ -50,6 +50,9 @@ Adherirse a la estructura de carpetas definida:
 *   **Encapsulamiento:** Atributos de modelos deben ser `private`.
 *   **Value Objects:** Deben validar sus valores en el constructor y lanzar errores si son inválidos.
 *   **Inyección de Dependecias:** Los servicios deben recibir **interfaces** (contratos) de sus dependencias, no implementaciones concretas.
+*   **Early Return:** Siempre que quieras codificar algo, ten en cuenta el patrón de Early Return.
+*   **Lanzamiento de Errores:** Los Value Objects y otras capas de validación deben lanzar errores específicos y descriptivos (ej: `InvalidValueError`).
+*   **Captura de Errores:** Los servicios o controladores deben capturar y manejar estos errores de manera apropiada, devolviendo respuestas significativas con los códigos HTTP correctos..
 
 ---
 
