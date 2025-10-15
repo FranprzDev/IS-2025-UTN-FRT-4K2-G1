@@ -1,3 +1,7 @@
+---
+alwaysApply: true
+---
+
 # 🤖 Reglas de Implementación para el Agente AI
 
 Este documento establece las directrices que el Agente AI debe seguir al implementar nuevas features en el proyecto, basandose en BDD.
