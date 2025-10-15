@@ -1,10 +1,10 @@
 import { Given, When, Then } from "@cucumber/cucumber";
 import { expect } from "chai";
-import { Enfermera } from "@/models/enfermera";
-import { Paciente } from "@/models/paciente";
-import { NivelEmergencia } from "@/models/nivelEmergencia";
-import { UrgenciaService } from "@/app/service/urgenciaService";
-import { DBPruebaEnMemoria } from "@/test/mocks/DBPruebaEnMemoria";
+import { Enfermera } from "../../../src/models/enfermera.js";
+import { Paciente } from "../../../src/models/paciente.js";
+import { NivelEmergencia } from "../../../src/models/nivelEmergencia.js";
+import { UrgenciaService } from "../../../src/app/service/urgenciaService.js";
+import { DBPruebaEnMemoria } from "@/test/mocks/DBPruebaEnMemoria.js";
 
 let enfermera: Enfermera | null = null;
 let dbMockeada: DBPruebaEnMemoria | null = null;
@@ -109,6 +109,43 @@ Then(
     expect(actualCuils).to.deep.equal(expectedCuils);
   },
 );
+
+Given("que el módulo de urgencias está disponible", function () {});
+
+Given("que el siguiente paciente esta registrado", function (dataTable) {
+  const row = dataTable.hashes()[0];
+  const cuil = row["Cuil"];
+  const nombre = row["Nombre"];
+  const apellido = row["Apellido"];
+  const obraSocial = row["Obra Social"];
+
+  const paciente = new Paciente(nombre, apellido, cuil, obraSocial);
+  dbMockeada!.guardarPaciente(paciente);
+});
+
+Given("que el paciente no existe en el sistema", function () {});
+
+Given("que la enfermera omite el dato {string}", function (campo: string) {});
+
+Given("que la enfermera ingresa un valor negativo en {string}", function (campo: string) {});
+
+Then("el sistema guarda el ingreso del paciente", function () {
+  const ingresos = servicioUrgencias!.obtenerIngresosPendientes();
+  expect(ingresos).to.have.length.greaterThan(0);
+});
+
+Then("el paciente entra en la cola de atención con estado {string}", function (estado: string) {
+  const ingresos = servicioUrgencias!.obtenerIngresosPendientes();
+  // revisar aquí que onda
+  expect(ingresos[ingresos.length - 1]?.NivelEmergencia).to.equal(estado);
+});
+
+Then("el sistema muestra el siguiente mensaje: {string}", function (mensaje: string) {
+  expect(excepcionEsperada).to.not.be.null;
+  expect(excepcionEsperada!.message).to.equal(mensaje);
+});
+
+Then("el sistema redirige a la pantalla de creación de pacientes.", function () {});
 
 Then(
   "el sistema muestra el siguiente error: {string}",
