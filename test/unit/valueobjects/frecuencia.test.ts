@@ -2,7 +2,6 @@ import { describe, it } from "node:test";
 import { expect } from "chai";
 import { Frecuencia } from "../../../src/models/valueobjects/frecuencia.js";
 
-// Creamos una clase concreta para poder testear la clase abstracta
 class FrecuenciaTest extends Frecuencia {
   public constructor(valor: number, rangoMinimo?: number, rangoMaximo?: number) {
     super("frecuencia test", valor, rangoMinimo, rangoMaximo);
@@ -46,7 +45,7 @@ describe("Frecuencia (abstract)", () => {
     });
 
     it("deberia no validar rango cuando no se especifica rango", () => {
-      const frecuencia: FrecuenciaTest = new FrecuenciaTest(1000); // Sin rango especificado
+      const frecuencia: FrecuenciaTest = new FrecuenciaTest(1000);
       expect(frecuencia).to.exist;
     });
   });

@@ -48,14 +48,14 @@ describe("UrgenciaService", () => {
 
       const ingresos = servicioUrgencias.obtenerIngresosPendientes();
       expect(ingresos).to.have.length(1);
-      expect(ingresos[0].CuilPaciente).to.equal("23-12345678-9");
+      expect(ingresos?.[0]?.CuilPaciente).to.equal("23-12345678-9");
     });
 
     it("deberia lanzar error cuando el paciente no existe", () => {
       setupTestData();
       expect(() => {
         servicioUrgencias.registrarUrgencia({
-          cuil: "99-99999999-9", // CUIL que no existe
+          cuil: "99-99999999-9",
           enfermera,
           informe: "Paciente con dolor abdominal",
           nivelEmergencia: NivelEmergencia.EMERGENCIA,
@@ -70,7 +70,6 @@ describe("UrgenciaService", () => {
 
     it("deberia ordenar correctamente por prioridad de emergencia", () => {
       setupTestData();
-      // Registrar paciente crítico (máxima prioridad)
       servicioUrgencias.registrarUrgencia({
         cuil: "23-12345678-9",
         enfermera,
@@ -83,7 +82,6 @@ describe("UrgenciaService", () => {
         frecuenciaDiastolica: 90,
       });
 
-      // Registrar paciente con emergencia (menor prioridad)
       servicioUrgencias.registrarUrgencia({
         cuil: "27-87654321-3",
         enfermera,
@@ -96,7 +94,6 @@ describe("UrgenciaService", () => {
         frecuenciaDiastolica: 85,
       });
 
-      // Registrar paciente sin urgencia (mínima prioridad)
       servicioUrgencias.registrarUrgencia({
         cuil: "23-11223344-5",
         enfermera,
@@ -112,15 +109,13 @@ describe("UrgenciaService", () => {
       const ingresos = servicioUrgencias.obtenerIngresosPendientes();
       expect(ingresos).to.have.length(3);
 
-      // Verificar orden: CRITICA (1), EMERGENCIA (2), SIN_URGENCIA (3)
-      expect(ingresos[0].CuilPaciente).to.equal("23-12345678-9"); // CRITICA
-      expect(ingresos[1].CuilPaciente).to.equal("27-87654321-3"); // EMERGENCIA
-      expect(ingresos[2].CuilPaciente).to.equal("23-11223344-5"); // SIN_URGENCIA
+      expect(ingresos[0]?.CuilPaciente).to.equal("23-12345678-9");
+      expect(ingresos[1]?.CuilPaciente).to.equal("27-87654321-3");
+      expect(ingresos[2]?.CuilPaciente).to.equal("23-11223344-5");
     });
 
     it("deberia ordenar por fecha cuando tienen el mismo nivel de emergencia", () => {
       setupTestData();
-      // Registrar primer paciente con urgencia
       servicioUrgencias.registrarUrgencia({
         cuil: "23-12345678-9",
         enfermera,
@@ -133,10 +128,8 @@ describe("UrgenciaService", () => {
         frecuenciaDiastolica: 80,
       });
 
-      // Pequeña pausa para asegurar fecha diferente
       setTimeout(() => {}, 10);
 
-      // Registrar segundo paciente con urgencia
       servicioUrgencias.registrarUrgencia({
         cuil: "27-87654321-3",
         enfermera,
@@ -152,9 +145,8 @@ describe("UrgenciaService", () => {
       const ingresos = servicioUrgencias.obtenerIngresosPendientes();
       expect(ingresos).to.have.length(2);
 
-      // El primer paciente registrado debería aparecer primero (fecha más antigua)
-      expect(ingresos[0].CuilPaciente).to.equal("23-12345678-9");
-      expect(ingresos[1].CuilPaciente).to.equal("27-87654321-3");
+      expect(ingresos?.[0]?.CuilPaciente).to.equal("23-12345678-9");
+      expect(ingresos?.[1]?.CuilPaciente).to.equal("27-87654321-3");
     });
   });
 
@@ -182,8 +174,8 @@ describe("UrgenciaService", () => {
       const ingresos1 = servicioUrgencias.obtenerIngresosPendientes();
       const ingresos2 = servicioUrgencias.obtenerIngresosPendientes();
 
-      expect(ingresos1).to.not.equal(ingresos2); // No debería ser la misma referencia
-      expect(ingresos1).to.deep.equal(ingresos2); // Pero sí mismo contenido
+      expect(ingresos1).to.not.equal(ingresos2);
+      expect(ingresos1).to.deep.equal(ingresos2);
     });
   });
 });
