@@ -1,0 +1,87 @@
+---
+alwaysApply: true
+---
+
+# 🤖 Reglas de Implementación para el Agente AI
+
+Este documento establece las directrices que el Agente AI debe seguir al implementar nuevas features en el proyecto, basandose en BDD.
+
+---
+
+## 1. 📋 Flujo de Desarrollo (BDD + TDD)
+
+Siempre seguir el siguiente flujo de desarrollo, priorizando TDD a nivel unitario antes de la implementación completa:
+
+*   **FEATURE (Gherkin):** Leer el comportamiento esperando en el archivo`.feature`.
+*   **STEP DEFINITIONS:** Crear la traducción de los pasos Gherkin en código.
+*   **TDD (Pruebas Unitarias):**
+    *   Antes de implementar la lógica, escribir pruebas unitarias que fallen para:
+        *   **Value Objects:** Validaciones en el constructor (ej: `FrecuenciaCardiaca`).
+        *   **Modelos:** Lógica interna (ej: `Ingreso.compararCon`).
+        *   **Servicios:** Lógica de negocio, utilizando "mocks" para las dependencias (ej: `UrgenciaService`).
+    *   Implementar el código mínimo para que las pruebas unitarias pasen.
+    *   Refactorizar el código unitario.
+*   **SERVICE:** Implementar la lógica de negocio principal.
+*   **MODELS:** Asegurar que las entidades y sus atributos estén correctos.
+*   **VALUE OBJECTS:** Implementar validaciones complejas.
+*   **Validación Final (BDD):** Ejecutar las pruebas Cucumber para verificar el comportamiento completo de la feature.
+
+---
+
+## 2. 📁 Estructura de Carpetas
+
+Adherirse a la estructura de carpetas definida:
+
+*   `src/`
+    *   `models/`: Entidades del dominio.
+        *   `valueobjects/`: Validaciones complejas (Value Objects).
+    *   `app/`
+        *   `interface/`: Contratos (interfaces para inyección de dependencias).
+        *   `service/`: Lógica de negocio (Services).
+        *   `presentation/`: Controllers/Routes (si aplica).
+    *   `test/mocks/`: BD simulada para tests.
+*   `test/`
+    *   `features/`: Archivos `.feature` (Gherkin).
+    *   `step_definitions/`: Implementación de los pasos Gherkin.
+    *   `unit/`: **Nueva carpeta para tests unitarios.**
+
+---
+
+## 3. 🔑 Reglas Clave de Codificación
+
+*   **Tipos:** Siempre añadir tipos explícitos a todas las variables, parámetros y retornos.
+*   **Comentarios:** NO añadir comentarios en el código, salvo que sean excepciones muy justificadas y se discuta previamente. El código debe ser auto-documentado.
+*   **Encapsulamiento:** Atributos de modelos deben ser `private`.
+*   **Value Objects:** Deben validar sus valores en el constructor y lanzar errores si son inválidos.
+*   **Inyección de Dependecias:** Los servicios deben recibir **interfaces** (contratos) de sus dependencias, no implementaciones concretas.
+*   **Early Return:** Siempre que quieras codificar algo, ten en cuenta el patrón de Early Return.
+*   **Lanzamiento de Errores:** Los Value Objects y otras capas de validación deben lanzar errores específicos y descriptivos (ej: `InvalidValueError`).
+*   **Captura de Errores:** Los servicios o controladores deben capturar y manejar estos errores de manera apropiada, devolviendo respuestas significativas con los códigos HTTP correctos..
+
+---
+
+## 4. 📝 Convenciones de Nombres
+
+*   **Modelos:** `PascalCase` (ej: `Paciente`, `Ingreso`).
+*   **Interfaces:** `PascalCase` (ej: `RepoPacientes`).
+*   **Services:** `PascalCase` con sufijo `Service` (ej: `UrgenciaService`).
+*   **Métodos Getter:** `get NombrePropiedand()` (ej: `get Cuil(): string`).
+*   **Métodos Lógica:** `nombreMetodo()` (ej: `registrarUrgencia()`).
+*   **Features:** `kebab-case` (ej: `modulo-urgencias.feature`).
+*   **Steps:** `camelCase` dentro del Given/When/Then.
+
+---
+
+## 5. ✅ Checklist Pre-Implementación (y Post-Implementación)
+
+Antes de considerar una feature terminada, verificar:
+
+*   [ ] ¿Se escribió la **FEATURE (Gherkin)** primero?
+*   [ ] ¿Se escribieron las **STEP DEFINITIONS**?
+*   [ ] ¿Se aplicó **TDD** para las **pruebas unitarias** de los componentes clave?
+*   [ ] ¿Todo el código tiene **TIPOS** explícitos?
+*   [ ] ¿No hay **COMENTARIOS** superfluos en el código?
+*   [ ] ¿Los atributos de los **Modelos** son `private`?
+*   [ ] ¿Los **Value Objects** validan en el constructor?
+*   [ ] ¿Los **Services** reciben **INTERFACES** (no implementaciones concretas)?
+*   [ ] ¿Todas las pruebas (unitarias y BDD) pasan (`npm run test:cucumber`, `npm run test:unit`)?
