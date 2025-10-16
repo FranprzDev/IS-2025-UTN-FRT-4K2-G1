@@ -11,7 +11,6 @@ Background:
   Given que la siguiente enfermera esta registrada:
   |Nombre   |Apellido|
   |Florencia|Perez   |
-  And que el módulo de urgencias está disponible
 
 Scenario: Registrar ingreso de un paciente existente con todos los datos obligatorios
   Given que el siguiente paciente esta registrado

@@ -4,6 +4,7 @@ import { NivelEmergencia } from "./nivelEmergencia.js";
 import { TensionArterial } from "./valueobjects/tensionArterial.js";
 import { FrecuenciaCardiaca } from "./valueobjects/frecuenciaCardiaca.js";
 import { FrecuenciaRespiratoria } from "./valueobjects/frecuenciaRespiratoria.js";
+import { Temperatura } from "./valueobjects/temperatura.js";
 
 interface IngresoArgs {
   paciente: Paciente;
@@ -23,7 +24,7 @@ export class Ingreso {
   private fechaIngreso: Date;
   private informe: string;
   private nivelEmergencia: NivelEmergencia;
-  private temperatura: number;
+  private temperatura: Temperatura;
   private frecuenciaCardiaca: FrecuenciaCardiaca;
   private frecuenciaRespiratoria: FrecuenciaRespiratoria;
   private tensionArterial: TensionArterial;
@@ -34,7 +35,7 @@ export class Ingreso {
     this.fechaIngreso = new Date();
     this.informe = args.informe;
     this.nivelEmergencia = args.nivelEmergencia;
-    this.temperatura = args.temperatura;
+    this.temperatura = new Temperatura(args.temperatura);
     this.frecuenciaCardiaca = new FrecuenciaCardiaca(args.frecuenciaCardiaca);
     this.frecuenciaRespiratoria = new FrecuenciaRespiratoria(
       args.frecuenciaRespiratoria,
