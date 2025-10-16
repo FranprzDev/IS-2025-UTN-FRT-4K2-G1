@@ -88,7 +88,6 @@ describe("Ingreso", () => {
     });
 
     it("deberia comparar por fecha cuando tienen el mismo nivel de emergencia", () => {
-      // Crear dos ingresos con el mismo nivel
       const ingreso1: Ingreso = new Ingreso({
         paciente,
         enfermera,
@@ -113,14 +112,10 @@ describe("Ingreso", () => {
         frecuenciaDiastolica: 70,
       });
 
-      // Como tienen el mismo nivel, deberían compararse por fecha
-      // La comparación por nivel debería ser 0, y luego por fecha
-      const comparacionNivel: number = ingreso1.NivelEmergencia.compararCon(ingreso2.NivelEmergencia);
-      expect(comparacionNivel).to.equal(0); // Mismo nivel
 
-      // La comparación total debería depender de la fecha
+      const comparacionNivel: number = ingreso1.NivelEmergencia.compararCon(ingreso2.NivelEmergencia);
+      expect(comparacionNivel).to.equal(0);
       const resultado: number = ingreso1.compararCon(ingreso2);
-      // El resultado puede ser diferente dependiendo del timing, pero no debería ser undefined
       expect(resultado).to.be.a('number');
     });
 

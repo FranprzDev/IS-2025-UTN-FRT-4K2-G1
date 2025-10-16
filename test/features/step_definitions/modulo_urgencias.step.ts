@@ -117,10 +117,7 @@ Given("que el siguiente paciente esta registrado", function (dataTable) {
   dbMockeada!.guardarPaciente(paciente);
 });
 
-Given("que el paciente no existe en el sistema", function () {
-  // No guardamos ningún paciente en la BD mockeada
-  // Esto simula que el paciente no existe en el sistema
-});
+Given("que el paciente no existe en el sistema", function () { });
 
 
 Then("el sistema guarda el ingreso del paciente", function () {
