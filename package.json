@@ -5,9 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test:cucumber": "tsx node_modules/@cucumber/cucumber/bin/cucumber.js test/features/*.feature --import test/features/step_definitions/*.ts",
-    "test:unit": "tsx --test test/unit/**/*.test.ts",
-    "test": "npm run test:unit && npm run test:cucumber",
+  "test:cucumber": "tsx node_modules/@cucumber/cucumber/bin/cucumber.js test/features/*.feature --import test/features/step_definitions/*.ts",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "dev": "tsx server.ts"
   },

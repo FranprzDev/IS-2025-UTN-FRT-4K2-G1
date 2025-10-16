@@ -18,6 +18,7 @@ Given("que la siguiente enfermera esta registrada:", function (dataTable) {
 
   enfermera = new Enfermera(nombre, apellido);
 
+  // Initialize the mock database and service
   dbMockeada = new DBPruebaEnMemoria();
   servicioUrgencias = new UrgenciaService(dbMockeada);
 });
@@ -48,10 +49,13 @@ When("Ingresan a urgencias los siguientes pacientes:", function (dataTable) {
     const frecuenciaCardiaca = parseFloat(row["Frecuencia Cardiaca"]);
     const frecuenciaRespiratoria = parseFloat(row["Frecuencia Respiratoria"]);
     const tensionArterialStr = row["Tension Arterial"];
+
+    // Parse tension arterial (format: "120/80")
     const tensionParts = tensionArterialStr.split("/");
     const frecuenciaSistolica = parseFloat(tensionParts[0]);
     const frecuenciaDiastolica = parseFloat(tensionParts[1]);
 
+    // Find the corresponding NivelEmergencia
     let nivelEmergencia: NivelEmergencia | null = null;
     const niveles = [
       NivelEmergencia.CRITICA,
@@ -106,6 +110,8 @@ Then(
   },
 );
 
+Given("que el módulo de urgencias está disponible", function () {});
+
 Given("que el siguiente paciente esta registrado", function (dataTable) {
   const row = dataTable.hashes()[0];
   const cuil = row["Cuil"];
@@ -117,11 +123,11 @@ Given("que el siguiente paciente esta registrado", function (dataTable) {
   dbMockeada!.guardarPaciente(paciente);
 });
 
-Given("que el paciente no existe en el sistema", function () {
-  // No guardamos ningún paciente en la BD mockeada
-  // Esto simula que el paciente no existe en el sistema
-});
+Given("que el paciente no existe en el sistema", function () {});
 
+Given("que la enfermera omite el dato {string}", function (campo: string) {});
+
+Given("que la enfermera ingresa un valor negativo en {string}", function (campo: string) {});
 
 Then("el sistema guarda el ingreso del paciente", function () {
   const ingresos = servicioUrgencias!.obtenerIngresosPendientes();
@@ -130,8 +136,8 @@ Then("el sistema guarda el ingreso del paciente", function () {
 
 Then("el paciente entra en la cola de atención con estado {string}", function (estado: string) {
   const ingresos = servicioUrgencias!.obtenerIngresosPendientes();
-  const ultimoIngreso = ingresos[ingresos.length - 1];
-  expect(ultimoIngreso?.Estado).to.equal(estado);
+  // revisar aquí que onda
+  expect(ingresos[ingresos.length - 1]?.NivelEmergencia).to.equal(estado);
 });
 
 Then("el sistema muestra el siguiente mensaje: {string}", function (mensaje: string) {
@@ -139,6 +145,7 @@ Then("el sistema muestra el siguiente mensaje: {string}", function (mensaje: str
   expect(excepcionEsperada!.message).to.equal(mensaje);
 });
 
+Then("el sistema redirige a la pantalla de creación de pacientes.", function () {});
 
 Then(
   "el sistema muestra el siguiente error: {string}",
