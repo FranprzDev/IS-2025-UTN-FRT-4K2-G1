@@ -1,6 +1,7 @@
 import { Paciente } from "./paciente.js";
 import { Enfermera } from "./enfermera.js";
 import { NivelEmergencia } from "./nivelEmergencia.js";
+import { EstadoIngreso } from "./estadoIngreso.js";
 import { TensionArterial } from "./valueobjects/tensionArterial.js";
 import { FrecuenciaCardiaca } from "./valueobjects/frecuenciaCardiaca.js";
 import { FrecuenciaRespiratoria } from "./valueobjects/frecuenciaRespiratoria.js";
@@ -11,6 +12,7 @@ interface IngresoArgs {
   enfermera: Enfermera;
   informe: string;
   nivelEmergencia: NivelEmergencia;
+  estado?: EstadoIngreso;
   temperatura: number;
   frecuenciaCardiaca: number;
   frecuenciaRespiratoria: number;
@@ -24,6 +26,7 @@ export class Ingreso {
   private fechaIngreso: Date;
   private informe: string;
   private nivelEmergencia: NivelEmergencia;
+  private estado: EstadoIngreso;
   private temperatura: Temperatura;
   private frecuenciaCardiaca: FrecuenciaCardiaca;
   private frecuenciaRespiratoria: FrecuenciaRespiratoria;
@@ -35,6 +38,7 @@ export class Ingreso {
     this.fechaIngreso = new Date();
     this.informe = args.informe;
     this.nivelEmergencia = args.nivelEmergencia;
+    this.estado = args.estado || EstadoIngreso.PENDIENTE;
     this.temperatura = new Temperatura(args.temperatura);
     this.frecuenciaCardiaca = new FrecuenciaCardiaca(args.frecuenciaCardiaca);
     this.frecuenciaRespiratoria = new FrecuenciaRespiratoria(
@@ -67,5 +71,13 @@ export class Ingreso {
 
   get FechaIngreso(): Date {
     return this.fechaIngreso;
+  }
+
+  get Estado(): EstadoIngreso {
+    return this.estado;
+  }
+
+  public cambiarEstado(nuevoEstado: EstadoIngreso): void {
+    this.estado = nuevoEstado;
   }
 }

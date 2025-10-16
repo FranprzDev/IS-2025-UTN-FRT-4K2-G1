@@ -4,6 +4,7 @@ import { Ingreso } from "../../src/models/ingreso.js";
 import { Paciente } from "../../src/models/paciente.js";
 import { Enfermera } from "../../src/models/enfermera.js";
 import { NivelEmergencia } from "../../src/models/nivelEmergencia.js";
+import { EstadoIngreso } from "../../src/models/estadoIngreso.js";
 
 describe("Ingreso", () => {
   let paciente: Paciente;
@@ -191,6 +192,56 @@ describe("Ingreso", () => {
 
       expect(ingreso.FechaIngreso.getTime()).to.be.greaterThanOrEqual(fechaAntes.getTime());
       expect(ingreso.FechaIngreso.getTime()).to.be.lessThanOrEqual(fechaDespues.getTime());
+    });
+
+    it("deberia inicializar el estado en PENDIENTE por defecto", () => {
+      const ingreso: Ingreso = new Ingreso({
+        paciente,
+        enfermera,
+        informe: "Paciente",
+        nivelEmergencia: NivelEmergencia.EMERGENCIA,
+        temperatura: 38,
+        frecuenciaCardiaca: 80,
+        frecuenciaRespiratoria: 16,
+        frecuenciaSistolica: 120,
+        frecuenciaDiastolica: 80,
+      });
+
+      expect(ingreso.Estado).to.equal(EstadoIngreso.PENDIENTE);
+    });
+
+    it("deberia permitir inicializar con un estado especifico", () => {
+      const ingreso: Ingreso = new Ingreso({
+        paciente,
+        enfermera,
+        informe: "Paciente",
+        nivelEmergencia: NivelEmergencia.EMERGENCIA,
+        estado: EstadoIngreso.EN_PROCESO,
+        temperatura: 38,
+        frecuenciaCardiaca: 80,
+        frecuenciaRespiratoria: 16,
+        frecuenciaSistolica: 120,
+        frecuenciaDiastolica: 80,
+      });
+
+      expect(ingreso.Estado).to.equal(EstadoIngreso.EN_PROCESO);
+    });
+
+    it("deberia permitir cambiar el estado", () => {
+      const ingreso: Ingreso = new Ingreso({
+        paciente,
+        enfermera,
+        informe: "Paciente",
+        nivelEmergencia: NivelEmergencia.EMERGENCIA,
+        temperatura: 38,
+        frecuenciaCardiaca: 80,
+        frecuenciaRespiratoria: 16,
+        frecuenciaSistolica: 120,
+        frecuenciaDiastolica: 80,
+      });
+
+      ingreso.cambiarEstado(EstadoIngreso.FINALIZADO);
+      expect(ingreso.Estado).to.equal(EstadoIngreso.FINALIZADO);
     });
   });
 });

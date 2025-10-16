@@ -131,7 +131,7 @@ Then("el sistema guarda el ingreso del paciente", function () {
 Then("el paciente entra en la cola de atención con estado {string}", function (estado: string) {
   const ingresos = servicioUrgencias!.obtenerIngresosPendientes();
   const ultimoIngreso = ingresos[ingresos.length - 1];
-  expect(ultimoIngreso?.NivelEmergencia.tieneNombre(estado)).to.be.true;
+  expect(ultimoIngreso?.Estado).to.equal(estado);
 });
 
 Then("el sistema muestra el siguiente mensaje: {string}", function (mensaje: string) {
