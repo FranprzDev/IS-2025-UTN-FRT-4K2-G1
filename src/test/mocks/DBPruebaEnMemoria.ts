@@ -5,7 +5,7 @@ export class DBPruebaEnMemoria implements RepoPacientes {
   private pacientes: Map<string, Paciente> = new Map();
 
   public guardarPaciente(paciente: Paciente): void {
-    this.pacientes.set(paciente.Cuil, paciente);
+    this.pacientes.set(paciente.Cuil.Valor, paciente);
   }
 
   public obtenerPacientePorCuil(cuil: string): Paciente {

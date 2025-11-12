@@ -62,7 +62,7 @@ export class Ingreso {
   }
 
   get CuilPaciente(): string {
-    return this.paciente.Cuil;
+    return this.paciente.Cuil.Valor;
   }
 
   get NivelEmergencia(): NivelEmergencia {
