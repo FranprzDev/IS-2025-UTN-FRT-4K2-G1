@@ -29,9 +29,9 @@ describe("NivelEmergencia", () => {
       ];
 
       for (let i = 0; i < niveles.length - 1; i++) {
-        const resultado: number = niveles[i].compararCon(niveles[i + 1]);
-        expect(resultado).to.be.greaterThan(0, `Nivel ${niveles[i].descripcion} debería tener menor prioridad que ${niveles[i + 1].descripcion}`);
-      }
+        const resultado: number = niveles[i]!.compararCon(niveles[i + 1]!);
+        expect(resultado).to.be.greaterThan(0, `Nivel ${niveles[i]!.descripcion} debería tener menor prioridad que ${niveles[i + 1]!.descripcion}`);
+      } 
     });
   });
 

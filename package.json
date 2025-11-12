@@ -9,7 +9,8 @@
     "test:unit": "tsx --test test/unit/**/*.test.ts",
     "test": "npm run test:unit && npm run test:cucumber",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "dev": "tsx server.ts"
+    "dev": "tsx server.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

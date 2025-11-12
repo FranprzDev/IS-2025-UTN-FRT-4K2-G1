@@ -16,16 +16,19 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version-file: '.nvmrc'
-        cache: 'npm'
+        cache: 'pnpm'
 
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install --frozen-lockfile
+
+    - name: Build the project
+      run: pnpm build
 
     - name: Check TypeScript compilation
-      run: npx tsc --noEmit
+      run: pnpm exec tsc --noEmit
 
     - name: Run Unit Tests
-      run: npm run test:unit
+      run: pnpm test:unit
 
     - name: Run Cucumber Tests
-      run: npm run test:cucumber
+      run: pnpm test:cucumber
