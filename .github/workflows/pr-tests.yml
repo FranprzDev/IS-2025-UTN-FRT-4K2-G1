@@ -1,6 +1,7 @@
-name: Cucumber Tests
-
+name: Backend Tests
 on:
+  pull_request:
+    branches: [ main, dev ]
   workflow_dispatch:
 
 jobs:
@@ -10,15 +11,21 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version-file: '.nvmrc'
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: npm ci
-      
-    - name: Run Cucumber tests
+
+    - name: Check TypeScript compilation
+      run: npx tsc --noEmit
+
+    - name: Run Unit Tests
+      run: npm run test:unit
+
+    - name: Run Cucumber Tests
       run: npm run test:cucumber
