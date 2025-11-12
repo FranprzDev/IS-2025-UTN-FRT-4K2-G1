@@ -40,17 +40,17 @@ When se intenta registrar el siguiente usuario:
 |Goniposse@gmail.com|1234         |Médico|
 Then el sistema muestra el siguiente mensaje de error: "La contraseña debe tener al menos 8 caracteres."
 
-Scenario: Intentar registrar un usuario sin contraseña o sin email.
+Scenario Outline: Intentar registrar un usuario sin contraseña o sin email.
 Given que el usuario no posee un usuario previamente registrado
 When se intenta registrar el siguiente usuario:
 |Email              |Contraseña   |Rol   |
-|                   |Contraseña123|Médico|
+|<email>            |<password>   |Médico|
 Then el sistema muestra el siguiente mensaje de error: "Se debe completar el campo <campo>."
 
-examples:
-|campo     |
-|Email     |
-|Contraseña|
+Examples:
+|campo     |email              |password     |
+|Email     |                   |Contraseña123|
+|Contraseña|Goniposse@gmail.com|             |
 
 Scenario: Intentar iniciar sesion con una cuenta invalida.
 Given que los siguientes usuarios se encuentran registrados en el sistema:

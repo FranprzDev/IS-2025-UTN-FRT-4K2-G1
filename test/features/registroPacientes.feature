@@ -46,15 +46,15 @@ Scenario: Registrar un paciente con todos los datos mandatorios, con obra social
     |20-44920883-9|Posse    |Gonzalo |Juan B. Teran 690|Osde        |56875             |
     Then El sistema muestra el siguiente mensaje de error: "El paciente no esta afiliado a esta obra social"
 
-Scenario: Registrar un paciente con algun dato mandatorio faltante.
+Scenario Outline: Registrar un paciente con algun dato mandatorio faltante.
     When se registra el siguiente paciente:
     |Cuil         |Apellido |Nombre  |Domicilio        |Obra Social |Numero de afiliado|
-    |             |Posse    |Gonzalo |Juan B. Teran 690|Osde        |56875             |
+    |<cuil>       |<apellido>|<nombre>|<domicilio>      |Osde        |56875             |
     Then El sistema envia el siguiente mensaje de error: "Se debe completar el campo: <campo>"
 
-    examples: 
-    |campo    |
-    |Cuil     |
-    |Apellido |
-    |Nombre   |
-    |Domicilio|
+    Examples:
+    |campo    |cuil         |apellido|nombre |domicilio      |
+    |Cuil     |             |Posse   |Gonzalo|Juan B. Teran 690|
+    |Apellido |20-44920883-9|        |Gonzalo|Juan B. Teran 690|
+    |Nombre   |20-44920883-9|Posse   |       |Juan B. Teran 690|
+    |Domicilio|20-44920883-9|Posse   |Gonzalo|                |
