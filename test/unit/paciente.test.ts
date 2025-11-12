@@ -1,28 +1,105 @@
 import { describe, it } from "node:test";
 import { expect } from "chai";
 import { Paciente } from "../../src/models/paciente.js";
+import { Email } from "../../src/models/valueobjects/email.js";
+import { Cuil } from "../../src/models/valueobjects/cuil.js";
+import { Afiliado } from "../../src/models/afiliado.js";
+import { ObraSocial } from "../../src/models/obraSocial.js";
+import { Domicilio } from "../../src/models/domicilio.js";
 
 describe("Paciente", () => {
   it("deberia crear paciente con datos validos", () => {
-    const paciente: Paciente = new Paciente("Juan", "Perez", "23-12345678-9", "OSDE");
+    const cuil: Cuil = new Cuil("23123456789");
+    const email: Email = new Email("juan@example.com");
+    const obraSocial: ObraSocial = new ObraSocial("1", "OSDE");
+    const afiliado: Afiliado = new Afiliado(obraSocial, "12345678");
+    const domicilio: Domicilio = new Domicilio(
+      "Av. Libertador",
+      "1234",
+      "Córdoba",
+      "Córdoba",
+      "Argentina",
+    );
+    const paciente: Paciente = new Paciente(
+      cuil,
+      "Juan",
+      "Perez",
+      email,
+      afiliado,
+      domicilio,
+    );
     expect(paciente).to.exist;
   });
 
   it("deberia devolver el cuil correcto", () => {
-    const cuil: string = "23-12345678-9";
-    const paciente: Paciente = new Paciente("Juan", "Perez", cuil, "OSDE");
-    expect(paciente.Cuil).to.equal(cuil);
+    const cuil: Cuil = new Cuil("23123456789");
+    const email: Email = new Email("juan@example.com");
+    const obraSocial: ObraSocial = new ObraSocial("1", "OSDE");
+    const afiliado: Afiliado = new Afiliado(obraSocial, "12345678");
+    const domicilio: Domicilio = new Domicilio(
+      "Av. Libertador",
+      "1234",
+      "Córdoba",
+      "Córdoba",
+      "Argentina",
+    );
+    const paciente: Paciente = new Paciente(
+      cuil,
+      "Juan",
+      "Perez",
+      email,
+      afiliado,
+      domicilio,
+    );
+    expect(paciente.Cuil.Valor).to.equal("23123456789");
   });
 
   it("deberia permitir nombres con espacios", () => {
-    const paciente: Paciente = new Paciente("Juan Carlos", "Perez Gonzalez", "23-12345678-9", "OSDE");
+    const cuil: Cuil = new Cuil("23123456789");
+    const email: Email = new Email("juan@example.com");
+    const obraSocial: ObraSocial = new ObraSocial("1", "OSDE");
+    const afiliado: Afiliado = new Afiliado(obraSocial, "12345678");
+    const domicilio: Domicilio = new Domicilio(
+      "Av. Libertador",
+      "1234",
+      "Córdoba",
+      "Córdoba",
+      "Argentina",
+    );
+    const paciente: Paciente = new Paciente(
+      cuil,
+      "Juan Carlos",
+      "Perez Gonzalez",
+      email,
+      afiliado,
+      domicilio,
+    );
     expect(paciente).to.exist;
-    expect(paciente.Cuil).to.equal("23-12345678-9");
+    expect(paciente.Nombre).to.equal("Juan Carlos");
+    expect(paciente.Apellido).to.equal("Perez Gonzalez");
   });
 
   it("deberia permitir obras sociales con espacios", () => {
-    const paciente: Paciente = new Paciente("Juan", "Perez", "23-12345678-9", "Swiss Medical");
+    const cuil: Cuil = new Cuil("23123456789");
+    const email: Email = new Email("juan@example.com");
+    const obraSocial: ObraSocial = new ObraSocial("1", "Swiss Medical");
+    const afiliado: Afiliado = new Afiliado(obraSocial, "12345678");
+    const domicilio: Domicilio = new Domicilio(
+      "Av. Libertador",
+      "1234",
+      "Córdoba",
+      "Córdoba",
+      "Argentina",
+    );
+    const paciente: Paciente = new Paciente(
+      cuil,
+      "Juan",
+      "Perez",
+      email,
+      afiliado,
+      domicilio,
+    );
     expect(paciente).to.exist;
-    expect(paciente.Cuil).to.equal("23-12345678-9");
+    expect(paciente.Afiliado.ObraSocial.Nombre).to.equal("Swiss Medical");
   });
 });
