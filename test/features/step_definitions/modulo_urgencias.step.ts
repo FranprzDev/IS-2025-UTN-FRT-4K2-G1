@@ -92,8 +92,9 @@ When("Ingresan a urgencias los siguientes pacientes:", function (dataTable) {
     }
 
     try {
+      const cuilSinGuiones = cuil.replace(/-/g, "");
       servicioUrgencias!.registrarUrgencia({
-        cuil: cuil,
+        cuil: cuilSinGuiones,
         enfermera: enfermera!,
         informe: informe,
         nivelEmergencia: nivelEmergencia,
