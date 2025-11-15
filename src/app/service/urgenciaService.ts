@@ -2,6 +2,10 @@ import { RepoPacientes } from "../interface/repoPacientes.js";
 import { Ingreso } from "../../models/ingreso.js";
 import { Enfermera } from "../../models/enfermera.js";
 import { NivelEmergencia } from "../../models/nivelEmergencia.js";
+import { Temperatura } from "../../models/valueobjects/temperatura.js";
+import { FrecuenciaCardiaca } from "../../models/valueobjects/frecuenciaCardiaca.js";
+import { FrecuenciaRespiratoria } from "../../models/valueobjects/frecuenciaRespiratoria.js";
+import { TensionArterial } from "../../models/valueobjects/tensionArterial.js";
 
 interface RegistrarUrgenciaArgs {
   cuil: string;
@@ -34,6 +38,11 @@ export class UrgenciaService {
     frecuenciaSistolica,
     frecuenciaDiastolica,
   }: RegistrarUrgenciaArgs): void {
+    new Temperatura(temperatura);
+    new FrecuenciaCardiaca(frecuenciaCardiaca);
+    new FrecuenciaRespiratoria(frecuenciaRespiratoria);
+    new TensionArterial(frecuenciaSistolica, frecuenciaDiastolica);
+
     const paciente = this.repoPacientes.obtenerPacientePorCuil(cuil);
 
     const ingreso = new Ingreso({

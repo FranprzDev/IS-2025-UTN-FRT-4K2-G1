@@ -4,6 +4,11 @@ import { Enfermera } from '../../../models/enfermera.js';
 import { NivelEmergencia, NivelEmergenciaCodigo } from '../../../models/nivelEmergencia.js';
 import { Paciente } from '../../../models/paciente.js';
 import { RepoPacientes } from '../../interface/repoPacientes.js';
+import { Cuil } from '../../../models/valueobjects/cuil.js';
+import { Email } from '../../../models/valueobjects/email.js';
+import { Afiliado } from '../../../models/afiliado.js';
+import { ObraSocial } from '../../../models/obraSocial.js';
+import { Domicilio } from '../../../models/domicilio.js';
 
 export class UrgenciasController {
   private urgenciaService: UrgenciaService;
@@ -16,9 +21,21 @@ export class UrgenciasController {
 
   public async crearPaciente(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, apellido, cuil, obraSocial } = req.body;
+      const { nombre, apellido, cuil, obraSocial, email, numeroAfiliado, calle, numero, ciudad, provincia, pais } = req.body;
       
-      const paciente = new Paciente(nombre, apellido, cuil, obraSocial);
+      const cuilObj: Cuil = new Cuil(cuil);
+      const emailObj: Email = new Email(email || `${nombre.toLowerCase()}.${apellido.toLowerCase()}@example.com`);
+      const obraSocialObj: ObraSocial = new ObraSocial("1", obraSocial);
+      const afiliado: Afiliado = new Afiliado(obraSocialObj, numeroAfiliado || "00000000");
+      const domicilio: Domicilio = new Domicilio(
+        calle || "Sin especificar",
+        numero || "0",
+        ciudad || "Sin especificar",
+        provincia || "Sin especificar",
+        pais || "Argentina"
+      );
+      
+      const paciente: Paciente = new Paciente(cuilObj, nombre, apellido, emailObj, afiliado, domicilio);
       this.repoPacientes.guardarPaciente(paciente);
       
       res.status(201).json({ message: 'Paciente creado exitosamente', paciente });
@@ -43,7 +60,15 @@ export class UrgenciasController {
       } = req.body;
 
       const nivelEmergenciaObj = this.obtenerNivelEmergencia(nivelEmergencia);
-      const enfermeraObj = new Enfermera(enfermera.nombre, enfermera.apellido);
+      const cuilEnfermera: Cuil = new Cuil(enfermera.cuil || "27123456789");
+      const emailEnfermera: Email = new Email(enfermera.email || `${enfermera.nombre.toLowerCase()}.${enfermera.apellido.toLowerCase()}@example.com`);
+      const enfermeraObj: Enfermera = new Enfermera(
+        cuilEnfermera,
+        enfermera.nombre,
+        enfermera.apellido,
+        emailEnfermera,
+        enfermera.matricula || "ENF00000"
+      );
 
       this.urgenciaService.registrarUrgencia({
         cuil,

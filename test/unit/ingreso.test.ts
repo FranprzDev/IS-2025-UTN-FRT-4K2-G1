@@ -5,13 +5,34 @@ import { Paciente } from "../../src/models/paciente.js";
 import { Enfermera } from "../../src/models/enfermera.js";
 import { NivelEmergencia } from "../../src/models/nivelEmergencia.js";
 import { EstadoIngreso } from "../../src/models/estadoIngreso.js";
+import { Email } from "../../src/models/valueobjects/email.js";
+import { Cuil } from "../../src/models/valueobjects/cuil.js";
+import { Afiliado } from "../../src/models/afiliado.js";
+import { ObraSocial } from "../../src/models/obraSocial.js";
+import { Domicilio } from "../../src/models/domicilio.js";
 
 describe("Ingreso", () => {
   let paciente: Paciente;
   let enfermera: Enfermera;
 
-  paciente = new Paciente("Juan", "Perez", "23-12345678-9", "OSDE");
-  enfermera = new Enfermera("Maria", "Gonzalez");
+  const obraSocial: ObraSocial = new ObraSocial("1", "OSDE");
+  const afiliado: Afiliado = new Afiliado(obraSocial, "12345678");
+  const domicilio: Domicilio = new Domicilio("Calle 1", "123", "Córdoba", "Córdoba", "Argentina");
+  paciente = new Paciente(
+    new Cuil("23123456789"),
+    "Juan",
+    "Perez",
+    new Email("juan@example.com"),
+    afiliado,
+    domicilio,
+  );
+  enfermera = new Enfermera(
+    new Cuil("27123456789"),
+    "Maria",
+    "Gonzalez",
+    new Email("maria@example.com"),
+    "ENF12345",
+  );
 
   it("deberia crear ingreso con datos validos", () => {
     const ingreso: Ingreso = new Ingreso({
@@ -42,8 +63,18 @@ describe("Ingreso", () => {
         frecuenciaDiastolica: 80,
       });
 
+      const obraSocial2: ObraSocial = new ObraSocial("2", "Swiss");
+      const afiliado2: Afiliado = new Afiliado(obraSocial2, "87654321");
+      const domicilio2: Domicilio = new Domicilio("Calle 2", "456", "Córdoba", "Córdoba", "Argentina");
       const ingresoEmergencia: Ingreso = new Ingreso({
-        paciente: new Paciente("Ana", "Lopez", "27-87654321-3", "Swiss"),
+        paciente: new Paciente(
+          new Cuil("27876543213"),
+          "Ana",
+          "Lopez",
+          new Email("ana@example.com"),
+          afiliado2,
+          domicilio2,
+        ),
         enfermera,
         informe: "Paciente con emergencia",
         nivelEmergencia: NivelEmergencia.EMERGENCIA,
@@ -71,8 +102,18 @@ describe("Ingreso", () => {
         frecuenciaDiastolica: 80,
       });
 
+      const obraSocial2: ObraSocial = new ObraSocial("2", "Swiss");
+      const afiliado2: Afiliado = new Afiliado(obraSocial2, "87654321");
+      const domicilio2: Domicilio = new Domicilio("Calle 2", "456", "Córdoba", "Córdoba", "Argentina");
       const ingresoCritico: Ingreso = new Ingreso({
-        paciente: new Paciente("Ana", "Lopez", "27-87654321-3", "Swiss"),
+        paciente: new Paciente(
+          new Cuil("27876543213"),
+          "Ana",
+          "Lopez",
+          new Email("ana@example.com"),
+          afiliado2,
+          domicilio2,
+        ),
         enfermera,
         informe: "Paciente critico",
         nivelEmergencia: NivelEmergencia.CRITICA,
@@ -100,8 +141,18 @@ describe("Ingreso", () => {
         frecuenciaDiastolica: 80,
       });
 
+      const obraSocial2: ObraSocial = new ObraSocial("2", "Swiss");
+      const afiliado2: Afiliado = new Afiliado(obraSocial2, "87654321");
+      const domicilio2: Domicilio = new Domicilio("Calle 2", "456", "Córdoba", "Córdoba", "Argentina");
       const ingreso2: Ingreso = new Ingreso({
-        paciente: new Paciente("Ana", "Lopez", "27-87654321-3", "Swiss"),
+        paciente: new Paciente(
+          new Cuil("27876543213"),
+          "Ana",
+          "Lopez",
+          new Email("ana@example.com"),
+          afiliado2,
+          domicilio2,
+        ),
         enfermera,
         informe: "Segundo paciente",
         nivelEmergencia: NivelEmergencia.EMERGENCIA,

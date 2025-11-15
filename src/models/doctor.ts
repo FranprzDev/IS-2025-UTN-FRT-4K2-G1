@@ -2,7 +2,7 @@ import { Persona } from "./persona.js";
 import { Cuil } from "./valueobjects/cuil.js";
 import { Email } from "./valueobjects/email.js";
 
-export class Enfermera extends Persona {
+export class Doctor extends Persona {
   private matricula: string;
 
   public constructor(
@@ -20,3 +20,4 @@ export class Enfermera extends Persona {
     return this.matricula;
   }
 }
+
