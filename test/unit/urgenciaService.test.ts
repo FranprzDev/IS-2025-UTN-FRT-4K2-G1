@@ -91,7 +91,7 @@ describe("UrgenciaService", () => {
 
       const ingresos = servicioUrgencias.obtenerIngresosPendientes();
       expect(ingresos).to.have.length(1);
-      expect(ingresos?.[0]?.CuilPaciente).to.equal("23123456789");
+      expect(ingresos?.[0]?.CuilPaciente).to.equal("23-12345678-9");
     });
 
     it("deberia lanzar error cuando el paciente no existe", () => {
@@ -152,9 +152,9 @@ describe("UrgenciaService", () => {
       const ingresos = servicioUrgencias.obtenerIngresosPendientes();
       expect(ingresos).to.have.length(3);
 
-      expect(ingresos[0]?.CuilPaciente).to.equal("23123456789");
-      expect(ingresos[1]?.CuilPaciente).to.equal("27876543213");
-      expect(ingresos[2]?.CuilPaciente).to.equal("23112233445");
+      expect(ingresos[0]?.CuilPaciente).to.equal("23-12345678-9");
+      expect(ingresos[1]?.CuilPaciente).to.equal("27-87654321-3");
+      expect(ingresos[2]?.CuilPaciente).to.equal("23-11223344-5");
     });
 
     it("deberia ordenar por fecha cuando tienen el mismo nivel de emergencia", () => {
@@ -188,8 +188,8 @@ describe("UrgenciaService", () => {
       const ingresos = servicioUrgencias.obtenerIngresosPendientes();
       expect(ingresos).to.have.length(2);
 
-      expect(ingresos?.[0]?.CuilPaciente).to.equal("23123456789");
-      expect(ingresos?.[1]?.CuilPaciente).to.equal("27876543213");
+      expect(ingresos?.[0]?.CuilPaciente).to.equal("23-12345678-9");
+      expect(ingresos?.[1]?.CuilPaciente).to.equal("27-87654321-3");
     });
   });
 

@@ -4,7 +4,7 @@ import { Enfermera } from "../../../src/models/enfermera.js";
 import { Paciente } from "../../../src/models/paciente.js";
 import { NivelEmergencia } from "../../../src/models/nivelEmergencia.js";
 import { UrgenciaService } from "../../../src/app/service/urgenciaService.js";
-import { DBPruebaEnMemoria } from "@/test/mocks/DBPruebaEnMemoria.js";
+import { DBPruebaEnMemoria } from "../../../src/test/mocks/DBPruebaEnMemoria.js";
 import { Cuil } from "../../../src/models/valueobjects/cuil.js";
 import { Email } from "../../../src/models/valueobjects/email.js";
 import { Afiliado } from "../../../src/models/afiliado.js";
@@ -149,7 +149,9 @@ Given("que el siguiente paciente esta registrado", function (dataTable) {
   dbMockeada!.guardarPaciente(paciente);
 });
 
-Given("que el paciente no existe en el sistema", function () { });
+Given("que el paciente no existe en el sistema", function () { 
+  // No hacer nada, ya que el paciente no existe en el sistema
+});
 
 
 Then("el sistema guarda el ingreso del paciente", function () {

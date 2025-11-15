@@ -62,7 +62,7 @@ export class Ingreso {
   }
 
   get CuilPaciente(): string {
-    return this.paciente.Cuil.Valor;
+    return this.paciente.Cuil.formatearConGuiones();
   }
 
   get NivelEmergencia(): NivelEmergencia {

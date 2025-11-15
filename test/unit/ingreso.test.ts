@@ -202,7 +202,7 @@ describe("Ingreso", () => {
         frecuenciaDiastolica: 80,
       });
 
-      expect(ingreso.CuilPaciente).to.equal("23123456789");
+      expect(ingreso.CuilPaciente).to.equal("23-12345678-9");
     });
 
     it("deberia devolver el nivel de emergencia", () => {
