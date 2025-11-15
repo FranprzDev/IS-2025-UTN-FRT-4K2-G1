@@ -98,7 +98,7 @@ describe("UrgenciaService", () => {
       setupTestData();
       expect(() => {
         servicioUrgencias.registrarUrgencia({
-          cuil: "99-99999999-9",
+          cuil: "99999999999",
           enfermera,
           informe: "Paciente con dolor abdominal",
           nivelEmergencia: NivelEmergencia.EMERGENCIA,
@@ -108,13 +108,13 @@ describe("UrgenciaService", () => {
           frecuenciaSistolica: 120,
           frecuenciaDiastolica: 80,
         });
-      }).to.throw("Paciente con CUIL 99999999999 no encontrado");
+      }).to.throw("Paciente con CUIL 99-99999999-9 no encontrado");
     });
 
     it("deberia ordenar correctamente por prioridad de emergencia", () => {
       setupTestData();
       servicioUrgencias.registrarUrgencia({
-        cuil: "23-12345678-9",
+        cuil: "23123456789",
         enfermera,
         informe: "Paciente crítico",
         nivelEmergencia: NivelEmergencia.CRITICA,
@@ -160,7 +160,7 @@ describe("UrgenciaService", () => {
     it("deberia ordenar por fecha cuando tienen el mismo nivel de emergencia", () => {
       setupTestData();
       servicioUrgencias.registrarUrgencia({
-        cuil: "23-12345678-9",
+        cuil: "23123456789",
         enfermera,
         informe: "Primer paciente urgencia",
         nivelEmergencia: NivelEmergencia.URGENCIA,
@@ -203,7 +203,7 @@ describe("UrgenciaService", () => {
     it("deberia devolver copia de la lista, no referencia", () => {
       setupTestData();
       servicioUrgencias.registrarUrgencia({
-        cuil: "23-12345678-9",
+        cuil: "23123456789",
         enfermera,
         informe: "Paciente",
         nivelEmergencia: NivelEmergencia.EMERGENCIA,

@@ -10,9 +10,10 @@ export class DBPruebaEnMemoria implements RepoPacientes {
   }
 
   public obtenerPacientePorCuil(cuil: string): Paciente {
-    const paciente = this.pacientes.get(cuil);
+    const cuilNormalizado: string = cuil.replace(/-/g, "");
+    const cuilObj: Cuil = new Cuil(cuilNormalizado);
+    const paciente: Paciente | undefined = this.pacientes.get(cuilObj.Valor);
     if (!paciente) {
-      const cuilObj = new Cuil(cuil);
       throw new Error(`Paciente con CUIL ${cuilObj.formatearConGuiones()} no encontrado`);
     }
     return paciente;
