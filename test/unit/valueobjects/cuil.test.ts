@@ -10,14 +10,14 @@ describe("Cuil", () => {
     expect(cuil.Valor).to.equal("20123456789");
   });
 
-  it("deberia lanzar error cuando el cuil tiene menos de 11 caracteres", () => {
-    expect(() => new Cuil("2012345678"))
-      .to.throw(InvalidValueError, "El CUIL debe tener 11 caracteres");
+  it("deberia lanzar error cuando el cuil tiene menos de 10 caracteres", () => {
+    expect(() => new Cuil("201234567"))
+      .to.throw(InvalidValueError, "El CUIL debe tener 10 o 11 caracteres");
   });
 
   it("deberia lanzar error cuando el cuil tiene mas de 11 caracteres", () => {
     expect(() => new Cuil("201234567890"))
-      .to.throw(InvalidValueError, "El CUIL debe tener 11 caracteres");
+      .to.throw(InvalidValueError, "El CUIL debe tener 10 o 11 caracteres");
   });
 
   it("deberia lanzar error cuando el cuil contiene letras", () => {
@@ -27,7 +27,7 @@ describe("Cuil", () => {
 
   it("deberia lanzar error cuando el cuil esta vacio", () => {
     expect(() => new Cuil(""))
-      .to.throw(InvalidValueError, "El CUIL debe tener 11 caracteres");
+      .to.throw(InvalidValueError, "El CUIL no puede ser vacio");
   });
 });
 

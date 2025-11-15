@@ -9,6 +9,9 @@ export class Cuil {
   }
 
   private validarFormato(cuil: string): void {
+    if(!cuil) {
+      throw new InvalidValueError("El CUIL no puede ser vacio");
+    }
     if (!cuil || (cuil.length !== 11 && cuil.length !== 10)) {
       throw new InvalidValueError("El CUIL debe tener 10 o 11 caracteres");
     }
