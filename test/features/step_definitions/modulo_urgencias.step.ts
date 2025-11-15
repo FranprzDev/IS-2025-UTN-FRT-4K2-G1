@@ -5,6 +5,11 @@ import { Paciente } from "../../../src/models/paciente.js";
 import { NivelEmergencia } from "../../../src/models/nivelEmergencia.js";
 import { UrgenciaService } from "../../../src/app/service/urgenciaService.js";
 import { DBPruebaEnMemoria } from "@/test/mocks/DBPruebaEnMemoria.js";
+import { Cuil } from "../../../src/models/valueobjects/cuil.js";
+import { Email } from "../../../src/models/valueobjects/email.js";
+import { Afiliado } from "../../../src/models/afiliado.js";
+import { ObraSocial } from "../../../src/models/obraSocial.js";
+import { Domicilio } from "../../../src/models/domicilio.js";
 
 let enfermera: Enfermera | null = null;
 let dbMockeada: DBPruebaEnMemoria | null = null;
@@ -16,7 +21,9 @@ Given("que la siguiente enfermera esta registrada:", function (dataTable) {
   const nombre = row["Nombre"];
   const apellido = row["Apellido"];
 
-  enfermera = new Enfermera(nombre, apellido);
+  const cuil: Cuil = new Cuil("27123456789");
+  const email: Email = new Email(`${nombre.toLowerCase()}@example.com`);
+  enfermera = new Enfermera(cuil, nombre, apellido, email, "ENF12345");
 
   dbMockeada = new DBPruebaEnMemoria();
   servicioUrgencias = new UrgenciaService(dbMockeada);
@@ -26,12 +33,24 @@ Given("que estan registrados los siguientes pacientes:", function (dataTable) {
   const rows = dataTable.hashes();
 
   for (const row of rows) {
-    const cuil = row["Cuil"];
+    const cuilStr = row["Cuil"];
     const nombre = row["Nombre"];
     const apellido = row["Apellido"];
-    const obraSocial = row["Obra Social"];
+    const obraSocialStr = row["Obra Social"];
 
-    const paciente = new Paciente(nombre, apellido, cuil, obraSocial);
+    const cuil: Cuil = new Cuil(cuilStr.replace(/-/g, ""));
+    const email: Email = new Email(`${nombre.toLowerCase()}@example.com`);
+    const obraSocial: ObraSocial = new ObraSocial("1", obraSocialStr);
+    const afiliado: Afiliado = new Afiliado(obraSocial, "12345678");
+    const domicilio: Domicilio = new Domicilio(
+      "Calle Principal",
+      "123",
+      "Córdoba",
+      "Córdoba",
+      "Argentina"
+    );
+
+    const paciente: Paciente = new Paciente(cuil, nombre, apellido, email, afiliado, domicilio);
     dbMockeada!.guardarPaciente(paciente);
   }
 });
@@ -108,12 +127,24 @@ Then(
 
 Given("que el siguiente paciente esta registrado", function (dataTable) {
   const row = dataTable.hashes()[0];
-  const cuil = row["Cuil"];
+  const cuilStr = row["Cuil"];
   const nombre = row["Nombre"];
   const apellido = row["Apellido"];
-  const obraSocial = row["Obra Social"];
+  const obraSocialStr = row["Obra Social"];
 
-  const paciente = new Paciente(nombre, apellido, cuil, obraSocial);
+  const cuil: Cuil = new Cuil(cuilStr.replace(/-/g, ""));
+  const email: Email = new Email(`${nombre.toLowerCase()}@example.com`);
+  const obraSocial: ObraSocial = new ObraSocial("1", obraSocialStr);
+  const afiliado: Afiliado = new Afiliado(obraSocial, "12345678");
+  const domicilio: Domicilio = new Domicilio(
+    "Calle Principal",
+    "123",
+    "Córdoba",
+    "Córdoba",
+    "Argentina"
+  );
+
+  const paciente: Paciente = new Paciente(cuil, nombre, apellido, email, afiliado, domicilio);
   dbMockeada!.guardarPaciente(paciente);
 });
 

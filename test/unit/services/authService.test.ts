@@ -1,7 +1,7 @@
 import { describe, it, beforeEach } from "node:test";
 import { expect } from "chai";
 import { AuthService } from "../../../src/app/service/authService.js";
-import { InMemoryUsuariosRepo } from "../../../mocks/inMemoryUsuariosRepo.js";
+import { InMemoryUsuariosRepo } from "../../mocks/inMemoryUsuariosRepo.js";
 import { BcryptPasswordHasher } from "../../../src/app/service/bcryptPasswordHasher.js";
 import { JwtService } from "../../../src/app/service/jwtService.js";
 import { AuthError } from "../../../src/app/service/errors/authError.js";

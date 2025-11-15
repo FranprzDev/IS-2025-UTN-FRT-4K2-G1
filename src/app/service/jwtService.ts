@@ -1,4 +1,5 @@
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
+import type { StringValue } from "ms";
 import { JwtProvider, JwtPayload } from "../interface/jwtProvider.js";
 
 export class JwtService implements JwtProvider {
@@ -14,9 +15,11 @@ export class JwtService implements JwtProvider {
   }
 
   public sign(payload: JwtPayload, expiresIn?: string): string {
-    return jwt.sign(payload, this.secret, {
-      expiresIn: expiresIn || this.defaultExpiresIn,
-    });
+    const expiresInValue: string = expiresIn || this.defaultExpiresIn;
+    const options: SignOptions = {
+      expiresIn: expiresInValue as StringValue,
+    };
+    return jwt.sign(payload, this.secret, options);
   }
 
   public verify(token: string): JwtPayload {
