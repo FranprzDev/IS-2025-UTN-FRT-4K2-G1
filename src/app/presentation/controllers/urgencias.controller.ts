@@ -21,7 +21,7 @@ export class UrgenciasController {
 
   public async crearPaciente(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, apellido, cuil, obraSocial, email, numeroAfiliado, calle, numero, ciudad, provincia, pais } = req.body;
+      const { nombre, apellido, cuil, obraSocial, email, numeroAfiliado, calle, numero, localidad } = req.body;
       
       const cuilObj: Cuil = new Cuil(cuil);
       const emailObj: Email = new Email(email || `${nombre.toLowerCase()}.${apellido.toLowerCase()}@example.com`);
@@ -30,9 +30,7 @@ export class UrgenciasController {
       const domicilio: Domicilio = new Domicilio(
         calle || "Sin especificar",
         numero || "0",
-        ciudad || "Sin especificar",
-        provincia || "Sin especificar",
-        pais || "Argentina"
+        localidad || "San Miguel de Tucumán"
       );
       
       const paciente: Paciente = new Paciente(cuilObj, nombre, apellido, emailObj, afiliado, domicilio);

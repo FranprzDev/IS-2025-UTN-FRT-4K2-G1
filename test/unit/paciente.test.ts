@@ -16,9 +16,7 @@ describe("Paciente", () => {
     const domicilio: Domicilio = new Domicilio(
       "Av. Libertador",
       "1234",
-      "Córdoba",
-      "Córdoba",
-      "Argentina",
+      "San Miguel de Tucumán",
     );
     const paciente: Paciente = new Paciente(
       cuil,
@@ -39,9 +37,7 @@ describe("Paciente", () => {
     const domicilio: Domicilio = new Domicilio(
       "Av. Libertador",
       "1234",
-      "Córdoba",
-      "Córdoba",
-      "Argentina",
+      "San Miguel de Tucumán",
     );
     const paciente: Paciente = new Paciente(
       cuil,
@@ -62,9 +58,7 @@ describe("Paciente", () => {
     const domicilio: Domicilio = new Domicilio(
       "Av. Libertador",
       "1234",
-      "Córdoba",
-      "Córdoba",
-      "Argentina",
+      "San Miguel de Tucumán",
     );
     const paciente: Paciente = new Paciente(
       cuil,
@@ -87,9 +81,7 @@ describe("Paciente", () => {
     const domicilio: Domicilio = new Domicilio(
       "Av. Libertador",
       "1234",
-      "Córdoba",
-      "Córdoba",
-      "Argentina",
+      "San Miguel de Tucumán",
     );
     const paciente: Paciente = new Paciente(
       cuil,
@@ -100,6 +92,6 @@ describe("Paciente", () => {
       domicilio,
     );
     expect(paciente).to.exist;
-    expect(paciente.Afiliado.ObraSocial.Nombre).to.equal("Swiss Medical");
+    expect(paciente.Afiliado?.ObraSocial.Nombre).to.equal("Swiss Medical");
   });
 });

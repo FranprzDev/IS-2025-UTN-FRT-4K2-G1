@@ -25,7 +25,7 @@ describe("UrgenciaService", () => {
 
     const obraSocial1: ObraSocial = new ObraSocial("1", "OSDE");
     const afiliado1: Afiliado = new Afiliado(obraSocial1, "12345678");
-    const domicilio1: Domicilio = new Domicilio("Calle 1", "123", "Córdoba", "Córdoba", "Argentina");
+    const domicilio1: Domicilio = new Domicilio("Calle 1", "123", "San Miguel de Tucumán");
     paciente1 = new Paciente(
       new Cuil("23123456789"),
       "Juan",
@@ -37,7 +37,7 @@ describe("UrgenciaService", () => {
 
     const obraSocial2: ObraSocial = new ObraSocial("2", "Swiss");
     const afiliado2: Afiliado = new Afiliado(obraSocial2, "87654321");
-    const domicilio2: Domicilio = new Domicilio("Calle 2", "456", "Córdoba", "Córdoba", "Argentina");
+    const domicilio2: Domicilio = new Domicilio("Calle 2", "456", "San Miguel de Tucumán");
     paciente2 = new Paciente(
       new Cuil("27876543213"),
       "Ana",
@@ -49,7 +49,7 @@ describe("UrgenciaService", () => {
 
     const obraSocial3: ObraSocial = new ObraSocial("3", "Fondo de Bikini");
     const afiliado3: Afiliado = new Afiliado(obraSocial3, "11223344");
-    const domicilio3: Domicilio = new Domicilio("Calle 3", "789", "Córdoba", "Córdoba", "Argentina");
+    const domicilio3: Domicilio = new Domicilio("Calle 3", "789", "San Miguel de Tucumán");
     paciente3 = new Paciente(
       new Cuil("23112233445"),
       "Carlos",

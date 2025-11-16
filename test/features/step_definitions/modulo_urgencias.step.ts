@@ -45,9 +45,7 @@ Given("que estan registrados los siguientes pacientes:", function (dataTable) {
     const domicilio: Domicilio = new Domicilio(
       "Calle Principal",
       "123",
-      "Córdoba",
-      "Córdoba",
-      "Argentina"
+      "San Miguel de Tucumán"
     );
 
     const paciente: Paciente = new Paciente(cuil, nombre, apellido, email, afiliado, domicilio);
@@ -140,9 +138,7 @@ Given("que el siguiente paciente esta registrado", function (dataTable) {
   const domicilio: Domicilio = new Domicilio(
     "Calle Principal",
     "123",
-    "Córdoba",
-    "Córdoba",
-    "Argentina"
+    "San Miguel de Tucumán"
   );
 
   const paciente: Paciente = new Paciente(cuil, nombre, apellido, email, afiliado, domicilio);
@@ -151,6 +147,7 @@ Given("que el siguiente paciente esta registrado", function (dataTable) {
 
 Given("que el paciente no existe en el sistema", function () { 
   // No hacer nada, ya que el paciente no existe en el sistema
+  // Consultar al chelingo si lo podemos sacar directamente.
 });
 
 
