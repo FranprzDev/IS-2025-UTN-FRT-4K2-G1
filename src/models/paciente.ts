@@ -5,7 +5,7 @@ import { Afiliado } from "./afiliado.js";
 import { Domicilio } from "./domicilio.js";
 
 export class Paciente extends Persona {
-  private afiliado: Afiliado;
+  private afiliado: Afiliado | null;
   private domicilio: Domicilio;
 
   public constructor(
@@ -13,7 +13,7 @@ export class Paciente extends Persona {
     nombre: string,
     apellido: string,
     email: Email,
-    afiliado: Afiliado,
+    afiliado: Afiliado | null,
     domicilio: Domicilio,
   ) {
     super(cuil, nombre, apellido, email);
@@ -21,7 +21,7 @@ export class Paciente extends Persona {
     this.domicilio = domicilio;
   }
 
-  get Afiliado(): Afiliado {
+  get Afiliado(): Afiliado | null {
     return this.afiliado;
   }
 

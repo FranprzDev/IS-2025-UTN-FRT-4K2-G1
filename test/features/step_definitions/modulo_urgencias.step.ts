@@ -45,9 +45,7 @@ Given("que estan registrados los siguientes pacientes:", function (dataTable) {
     const domicilio: Domicilio = new Domicilio(
       "Calle Principal",
       "123",
-      "Córdoba",
-      "Córdoba",
-      "Argentina"
+      "San Miguel de Tucumán"
     );
 
     const paciente: Paciente = new Paciente(cuil, nombre, apellido, email, afiliado, domicilio);

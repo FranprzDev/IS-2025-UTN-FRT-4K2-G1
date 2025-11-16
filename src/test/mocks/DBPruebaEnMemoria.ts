@@ -9,6 +9,18 @@ export class DBPruebaEnMemoria implements RepoPacientes {
     this.pacientes.set(paciente.Cuil.Valor, paciente);
   }
 
+  public guardar(entidad: Paciente): void {
+    this.pacientes.set(entidad.Cuil.Valor, entidad);
+  }
+
+  public obtenerPorId(id: string): Paciente | null {
+    return this.pacientes.get(id) || null;
+  }
+
+  public obtenerTodos(): Paciente[] {
+    return Array.from(this.pacientes.values());
+  }
+
   public obtenerPacientePorCuil(cuil: string): Paciente {
     const cuilNormalizado: string = cuil.replace(/-/g, "");
     const cuilObj: Cuil = new Cuil(cuilNormalizado);

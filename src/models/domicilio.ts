@@ -1,22 +1,39 @@
+import { InvalidValueError } from "./valueobjects/errors/InvalidValueError.js";
+
 export class Domicilio {
   private calle: string;
   private numero: string;
-  private ciudad: string;
-  private provincia: string;
-  private pais: string;
+  private localidad: string;
 
   public constructor(
     calle: string,
     numero: string,
-    ciudad: string,
-    provincia: string,
-    pais: string,
+    localidad: string,
   ) {
+    this.validarCalle(calle);
+    this.validarNumero(numero);
+    this.validarLocalidad(localidad);
     this.calle = calle;
     this.numero = numero;
-    this.ciudad = ciudad;
-    this.provincia = provincia;
-    this.pais = pais;
+    this.localidad = localidad;
+  }
+
+  private validarCalle(calle: string): void {
+    if (!calle || calle.trim() === "") {
+      throw new InvalidValueError("La calle no puede estar vacía");
+    }
+  }
+
+  private validarNumero(numero: string): void {
+    if (!numero || numero.trim() === "") {
+      throw new InvalidValueError("El número no puede estar vacío");
+    }
+  }
+
+  private validarLocalidad(localidad: string): void {
+    if (!localidad || localidad.trim() === "") {
+      throw new InvalidValueError("La localidad no puede estar vacía");
+    }
   }
 
   get Calle(): string {
@@ -27,16 +44,8 @@ export class Domicilio {
     return this.numero;
   }
 
-  get Ciudad(): string {
-    return this.ciudad;
-  }
-
-  get Provincia(): string {
-    return this.provincia;
-  }
-
-  get Pais(): string {
-    return this.pais;
+  get Localidad(): string {
+    return this.localidad;
   }
 }
 

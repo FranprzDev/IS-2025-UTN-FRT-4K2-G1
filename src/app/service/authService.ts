@@ -23,7 +23,7 @@ export class AuthService {
 
     const emailVO: Email = new Email(email);
     const usuarioExistente: Usuario | null =
-      await this.repoUsuarios.findByEmail(emailVO);
+      await this.repoUsuarios.buscarPorEmail(emailVO);
 
     if (usuarioExistente) {
       throw new InvalidValueError("Email ya registrado");
@@ -37,7 +37,7 @@ export class AuthService {
       rol,
     );
 
-    await this.repoUsuarios.save(usuario);
+    await this.repoUsuarios.guardar(usuario);
     return usuario;
   }
 
@@ -47,7 +47,7 @@ export class AuthService {
   ): Promise<{ token: string }> {
     const emailVO: Email = new Email(email);
     const usuario: Usuario | null =
-      await this.repoUsuarios.findByEmail(emailVO);
+      await this.repoUsuarios.buscarPorEmail(emailVO);
 
     if (!usuario) {
       throw new AuthError("Usuario o contraseña inválidos");
