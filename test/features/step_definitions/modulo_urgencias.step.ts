@@ -147,6 +147,7 @@ Given("que el siguiente paciente esta registrado", function (dataTable) {
 
 Given("que el paciente no existe en el sistema", function () { 
   // No hacer nada, ya que el paciente no existe en el sistema
+  // Consultar al chelingo si lo podemos sacar directamente.
 });
 
 
