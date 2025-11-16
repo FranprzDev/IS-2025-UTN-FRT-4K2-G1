@@ -92,6 +92,6 @@ describe("Paciente", () => {
       domicilio,
     );
     expect(paciente).to.exist;
-    expect(paciente.Afiliado.ObraSocial.Nombre).to.equal("Swiss Medical");
+    expect(paciente.Afiliado?.ObraSocial.Nombre).to.equal("Swiss Medical");
   });
 });
