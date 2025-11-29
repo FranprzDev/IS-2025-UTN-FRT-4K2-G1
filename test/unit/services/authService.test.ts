@@ -6,6 +6,7 @@ import { BcryptPasswordHasher } from "../../../src/app/service/bcryptPasswordHas
 import { JwtService } from "../../../src/app/service/jwtService.js";
 import { AuthError } from "../../../src/app/service/errors/authError.js";
 import { InvalidValueError } from "../../../src/models/valueobjects/errors/InvalidValueError.js";
+import { Rol } from "@/models/usuario.js";
 
 describe("AuthService", () => {
   let authService: AuthService;
@@ -29,7 +30,7 @@ describe("AuthService", () => {
     const usuario = await authService.registrarUsuario(
       "test@example.com",
       "password123",
-      "medico",
+      Rol.MEDICO,
     );
 
     expect(usuario).to.exist;
@@ -42,14 +43,14 @@ describe("AuthService", () => {
     await authService.registrarUsuario(
       "test@example.com",
       "password123",
-      "medico",
+      Rol.MEDICO,
     );
 
     try {
       await authService.registrarUsuario(
         "test@example.com",
         "password456",
-        "enfermero",
+        Rol.ENFERMERA,
       );
       expect.fail("Deberia haber lanzado un error");
     } catch (error) {
@@ -60,7 +61,7 @@ describe("AuthService", () => {
 
   it("deberia lanzar error al registrar usuario con contraseña corta", async () => {
     try {
-      await authService.registrarUsuario("test@example.com", "short", "medico");
+      await authService.registrarUsuario("test@example.com", "short", Rol.MEDICO);
       expect.fail("Deberia haber lanzado un error");
     } catch (error) {
       expect(error).to.be.instanceOf(InvalidValueError);
@@ -74,7 +75,7 @@ describe("AuthService", () => {
     await authService.registrarUsuario(
       "test@example.com",
       "password123",
-      "medico",
+      Rol.MEDICO,
     );
 
     const resultado = await authService.iniciarSesion(
@@ -100,7 +101,7 @@ describe("AuthService", () => {
     await authService.registrarUsuario(
       "test@example.com",
       "password123",
-      "medico",
+      Rol.MEDICO,
     );
 
     try {
@@ -116,7 +117,7 @@ describe("AuthService", () => {
     await authService.registrarUsuario(
       "test@example.com",
       "password123",
-      "enfermero",
+      Rol.ENFERMERA,
     );
 
     const resultado = await authService.iniciarSesion(
