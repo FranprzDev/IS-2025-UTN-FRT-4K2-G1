@@ -1,6 +1,10 @@
 import { Email } from "./valueobjects/email.js";
 
-export type Rol = "medico" | "enfermero";
+export enum Rol {
+  MEDICO = "medico",
+  ENFERMERA = "enfermero",
+  ADMISION = "administrativo"
+}
 
 export class Usuario {
   private id: string;

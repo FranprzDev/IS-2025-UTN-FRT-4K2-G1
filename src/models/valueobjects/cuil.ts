@@ -33,5 +33,9 @@ export class Cuil {
     }
     return this.valor;
   }
+
+  public toJSON(): object {
+    return { valor: this.valor };
+  }
 }
 
