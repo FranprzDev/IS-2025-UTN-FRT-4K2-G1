@@ -19,11 +19,12 @@ export class UrgenciasController {
     this.repoPacientes = repoPacientes;
   }
 
-  public async crearPaciente(req: Request, res: Response): Promise<void> {
+    public async crearPaciente(req: Request, res: Response): Promise<void> {
     try {
       const { nombre, apellido, cuil, obraSocial, email, numeroAfiliado, calle, numero, localidad } = req.body;
       
-      const cuilObj: Cuil = new Cuil(cuil);
+      const cuilSanitized = cuil.replace(/\D/g, '');
+      const cuilObj: Cuil = new Cuil(cuilSanitized);
       const emailObj: Email = new Email(email || `${nombre.toLowerCase()}.${apellido.toLowerCase()}@example.com`);
       const obraSocialObj: ObraSocial = new ObraSocial("1", obraSocial);
       const afiliado: Afiliado = new Afiliado(obraSocialObj, numeroAfiliado || "00000000");
@@ -58,7 +59,8 @@ export class UrgenciasController {
       } = req.body;
 
       const nivelEmergenciaObj = this.obtenerNivelEmergencia(nivelEmergencia);
-      const cuilEnfermera: Cuil = new Cuil(enfermera.cuil || "27123456789");
+      const cuilEnfermeraSanitized = (enfermera.cuil || "27123456789").replace(/\D/g, '');
+      const cuilEnfermera: Cuil = new Cuil(cuilEnfermeraSanitized);
       const emailEnfermera: Email = new Email(enfermera.email || `${enfermera.nombre.toLowerCase()}.${enfermera.apellido.toLowerCase()}@example.com`);
       const enfermeraObj: Enfermera = new Enfermera(
         cuilEnfermera,

@@ -34,5 +34,14 @@ export class Persona {
   get Email(): Email {
     return this.email;
   }
+
+  public toJSON(): object {
+    return {
+      cuil: this.cuil,
+      nombre: this.nombre,
+      apellido: this.apellido,
+      email: this.email,
+    };
+  }
 }
 

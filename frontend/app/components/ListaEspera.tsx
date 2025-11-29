@@ -68,7 +68,6 @@ export default function ListaEspera({ refreshTrigger }: { refreshTrigger: number
                                         </span>
                                     </td>
                                     <td style={{ padding: '1rem' }}>{new Date().toLocaleDateString()}</td>
-                                    {/* Note: Ingreso model might not have fechaHora exposed or it's created at runtime. Using current date for demo if missing. */}
                                 </tr>
                             ))
                         )}

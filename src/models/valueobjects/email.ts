@@ -18,5 +18,9 @@ export class Email {
   get Valor(): string {
     return this.valor;
   }
+
+  public toJSON(): object {
+    return { valor: this.valor };
+  }
 }
 

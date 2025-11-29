@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function UrgenciaForm({ defaultCuil, onSuccess }: { defaultCuil?: string, onSuccess: () => void }) {
     const [formData, setFormData] = useState({
@@ -15,12 +15,18 @@ export default function UrgenciaForm({ defaultCuil, onSuccess }: { defaultCuil?:
         enfermera: {
             nombre: 'Ana',
             apellido: 'García',
-            cuil: '27-12345678-9',
+            cuil: '27123456789',
             matricula: 'ENF1234',
             email: 'ana@hospital.com'
         }
     });
     const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        if (defaultCuil) {
+            setFormData(prev => ({ ...prev, cuil: defaultCuil }));
+        }
+    }, [defaultCuil]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

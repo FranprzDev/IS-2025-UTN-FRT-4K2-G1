@@ -80,4 +80,19 @@ export class Ingreso {
   public cambiarEstado(nuevoEstado: EstadoIngreso): void {
     this.estado = nuevoEstado;
   }
+
+  public toJSON(): object {
+    return {
+      paciente: this.paciente,
+      enfermera: this.enfermera,
+      fechaIngreso: this.fechaIngreso,
+      informe: this.informe,
+      nivelEmergencia: this.nivelEmergencia,
+      estado: this.estado,
+      temperatura: this.temperatura,
+      frecuenciaCardiaca: this.frecuenciaCardiaca,
+      frecuenciaRespiratoria: this.frecuenciaRespiratoria,
+      tensionArterial: this.tensionArterial,
+    };
+  }
 }
