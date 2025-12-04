@@ -1,7 +1,9 @@
 import { RepoPacientes } from "../interface/repoPacientes.js";
 import { Ingreso } from "../../models/ingreso.js";
 import { Enfermera } from "../../models/enfermera.js";
+import { Doctor } from "../../models/doctor.js";
 import { NivelEmergencia } from "../../models/nivelEmergencia.js";
+import { EstadoIngreso } from "../../models/estadoIngreso.js";
 import { Temperatura } from "../../models/valueobjects/temperatura.js";
 import { FrecuenciaCardiaca } from "../../models/valueobjects/frecuenciaCardiaca.js";
 import { FrecuenciaRespiratoria } from "../../models/valueobjects/frecuenciaRespiratoria.js";
@@ -62,6 +64,23 @@ export class UrgenciaService {
   }
 
   public obtenerIngresosPendientes(): Ingreso[] {
-    return [...this.listaEspera];
+    return this.listaEspera.filter(
+      (ingreso) => ingreso.Estado === EstadoIngreso.PENDIENTE
+    );
+  }
+
+  public reclamarProximoPaciente(doctor: Doctor): Ingreso {
+    const ingresosPendientes = this.listaEspera.filter(
+      (ingreso) => ingreso.Estado === EstadoIngreso.PENDIENTE
+    );
+
+    if (ingresosPendientes.length === 0) {
+      throw new Error("No hay pacientes en la lista de espera.");
+    }
+
+    const proximoIngreso = ingresosPendientes[0];
+    proximoIngreso.cambiarEstado(EstadoIngreso.EN_PROCESO);
+
+    return proximoIngreso;
   }
 }
