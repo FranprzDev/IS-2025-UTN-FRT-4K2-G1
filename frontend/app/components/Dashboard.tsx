@@ -4,21 +4,31 @@ import { useState, useEffect } from 'react';
 import PacienteForm from './PacienteForm';
 import UrgenciaForm from './UrgenciaForm';
 import ListaEspera from './ListaEspera';
+import UsuarioForm from './UsuarioForm';
 import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'registro' | 'urgencia' | 'lista'>('registro');
+    const [activeTab, setActiveTab] = useState<'registro' | 'urgencia' | 'lista' | 'usuarios'>('registro');
     const [selectedCuil, setSelectedCuil] = useState('');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [userName, setUserName] = useState('Administrativo');
+    const [userRole, setUserRole] = useState<string>('administrativo');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
             router.push('/');
+            return;
         }
-        // Decode token to get user name if possible, or just leave as default
+        
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            setUserRole(payload.rol || 'administrativo');
+            setUserName(payload.email?.split('@')[0] || 'Usuario');
+        } catch (error) {
+            console.error('Error decodificando token:', error);
+        }
     }, [router]);
 
     const handlePacienteSuccess = (cuil: string) => {
@@ -58,6 +68,14 @@ export default function Dashboard() {
                     >
                         <span>📋</span> Lista de Espera
                     </button>
+                    {userRole === 'administrativo' && (
+                        <button
+                            className={`nav-item ${activeTab === 'usuarios' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('usuarios')}
+                        >
+                            <span>👨‍⚕️</span> Crear Usuario
+                        </button>
+                    )}
                 </nav>
 
                 <div className="user-profile">
@@ -78,6 +96,7 @@ export default function Dashboard() {
                         {activeTab === 'registro' && 'Registro de Pacientes'}
                         {activeTab === 'urgencia' && 'Ingreso de Urgencia'}
                         {activeTab === 'lista' && 'Sala de Espera'}
+                        {activeTab === 'usuarios' && 'Gestión de Usuarios'}
                     </h1>
                     <div className="date-display">
                         {new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -100,6 +119,12 @@ export default function Dashboard() {
                     {activeTab === 'lista' && (
                         <div className="fade-in">
                             <ListaEspera refreshTrigger={refreshTrigger} />
+                        </div>
+                    )}
+
+                    {activeTab === 'usuarios' && (
+                        <div className="fade-in">
+                            <UsuarioForm onSuccess={() => {}} />
                         </div>
                     )}
                 </div>
