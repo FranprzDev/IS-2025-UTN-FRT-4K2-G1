@@ -11,6 +11,10 @@ export const crearReclamoRouter = (reclamoController: ReclamoController, jwtProv
     reclamoController.reclamarProximoPaciente(req, res);
   });
 
+  router.get('/mis-ingresos', authMiddleware, (req, res) => {
+    reclamoController.obtenerIngresosDelDoctor(req, res);
+  });
+
   return router;
 };
 

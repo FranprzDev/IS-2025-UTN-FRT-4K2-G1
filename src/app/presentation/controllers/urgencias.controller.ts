@@ -105,7 +105,7 @@ export class UrgenciasController {
   public async obtenerListaEspera(req: Request, res: Response): Promise<void> {
     try {
       const ingresosPendientes = this.urgenciaService.obtenerIngresosPendientes();
-      res.status(200).json(ingresosPendientes);
+      res.status(200).json(ingresosPendientes.map((ingreso) => ingreso.toJSON()));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       res.status(500).json({ error: errorMessage });
