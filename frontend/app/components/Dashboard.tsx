@@ -1,19 +1,42 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PacienteForm from './PacienteForm';
 import UrgenciaForm from './UrgenciaForm';
 import ListaEspera from './ListaEspera';
 import UsuarioForm from './UsuarioForm';
 import { useRouter } from 'next/navigation';
 
+type Tab = 'registro' | 'urgencia' | 'lista' | 'usuarios';
+type Role = 'administrativo' | 'medico' | 'enfermera';
+
+const resolveRole = (role: string | undefined): Role => {
+    const normalized = (role || '').toLowerCase();
+    if (normalized === 'medico' || normalized === 'enfermera') {
+        return normalized;
+    }
+    return 'administrativo';
+};
+
+const getAllowedTabs = (role: Role): Tab[] => {
+    if (role === 'medico') {
+        return ['lista'];
+    }
+    if (role === 'enfermera') {
+        return ['registro', 'urgencia', 'lista'];
+    }
+    return ['registro', 'urgencia', 'lista', 'usuarios'];
+};
+
 export default function Dashboard() {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'registro' | 'urgencia' | 'lista' | 'usuarios'>('registro');
+    const [activeTab, setActiveTab] = useState<Tab>('registro');
     const [selectedCuil, setSelectedCuil] = useState('');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [userName, setUserName] = useState('Administrativo');
-    const [userRole, setUserRole] = useState<string>('administrativo');
+    const [userRole, setUserRole] = useState<Role>('administrativo');
+
+    const allowedTabs = useMemo(() => getAllowedTabs(userRole), [userRole]);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -24,12 +47,19 @@ export default function Dashboard() {
         
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
-            setUserRole(payload.rol || 'administrativo');
+            const resolvedRole = resolveRole(payload.rol);
+            setUserRole(resolvedRole);
             setUserName(payload.email?.split('@')[0] || 'Usuario');
         } catch (error) {
             console.error('Error decodificando token:', error);
         }
     }, [router]);
+
+    useEffect(() => {
+        if (!allowedTabs.includes(activeTab)) {
+            setActiveTab(allowedTabs[0]);
+        }
+    }, [activeTab, allowedTabs]);
 
     const handlePacienteSuccess = (cuil: string) => {
         setSelectedCuil(cuil);
@@ -50,25 +80,31 @@ export default function Dashboard() {
                 </div>
 
                 <nav className="nav-menu">
-                    <button
-                        className={`nav-item ${activeTab === 'registro' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('registro')}
-                    >
-                        <span>👤</span> Nuevo Paciente
-                    </button>
-                    <button
-                        className={`nav-item ${activeTab === 'urgencia' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('urgencia')}
-                    >
-                        <span>🚑</span> Ingresar Urgencia
-                    </button>
-                    <button
-                        className={`nav-item ${activeTab === 'lista' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('lista')}
-                    >
-                        <span>📋</span> Lista de Espera
-                    </button>
-                    {userRole === 'administrativo' && (
+                    {allowedTabs.includes('registro') && (
+                        <button
+                            className={`nav-item ${activeTab === 'registro' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('registro')}
+                        >
+                            <span>👤</span> Nuevo Paciente
+                        </button>
+                    )}
+                    {allowedTabs.includes('urgencia') && (
+                        <button
+                            className={`nav-item ${activeTab === 'urgencia' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('urgencia')}
+                        >
+                            <span>🚑</span> Ingresar Urgencia
+                        </button>
+                    )}
+                    {allowedTabs.includes('lista') && (
+                        <button
+                            className={`nav-item ${activeTab === 'lista' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('lista')}
+                        >
+                            <span>📋</span> Lista de Espera
+                        </button>
+                    )}
+                    {allowedTabs.includes('usuarios') && (
                         <button
                             className={`nav-item ${activeTab === 'usuarios' ? 'active' : ''}`}
                             onClick={() => setActiveTab('usuarios')}
@@ -104,25 +140,25 @@ export default function Dashboard() {
                 </header>
 
                 <div className="content-area">
-                    {activeTab === 'registro' && (
+                    {activeTab === 'registro' && allowedTabs.includes('registro') && (
                         <div className="fade-in">
                             <PacienteForm onSuccess={handlePacienteSuccess} />
                         </div>
                     )}
 
-                    {activeTab === 'urgencia' && (
+                    {activeTab === 'urgencia' && allowedTabs.includes('urgencia') && (
                         <div className="fade-in">
                             <UrgenciaForm defaultCuil={selectedCuil} onSuccess={handleUrgenciaSuccess} />
                         </div>
                     )}
 
-                    {activeTab === 'lista' && (
+                    {activeTab === 'lista' && allowedTabs.includes('lista') && (
                         <div className="fade-in">
                             <ListaEspera refreshTrigger={refreshTrigger} />
                         </div>
                     )}
 
-                    {activeTab === 'usuarios' && (
+                    {activeTab === 'usuarios' && allowedTabs.includes('usuarios') && (
                         <div className="fade-in">
                             <UsuarioForm onSuccess={() => {}} />
                         </div>
