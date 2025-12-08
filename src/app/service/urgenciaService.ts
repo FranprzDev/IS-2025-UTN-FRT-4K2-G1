@@ -69,18 +69,35 @@ export class UrgenciaService {
     );
   }
 
-  public reclamarProximoPaciente(doctor: Doctor): Ingreso {
-    const ingresosPendientes = this.listaEspera.filter(
-      (ingreso) => ingreso.Estado === EstadoIngreso.PENDIENTE
+  public reclamarPaciente(doctor: Doctor, cuilPaciente?: string): Ingreso {
+    const ingresosPendientes: Ingreso[] = this.listaEspera.filter(
+      (ingreso) => ingreso.Estado === EstadoIngreso.PENDIENTE,
     );
 
     if (ingresosPendientes.length === 0) {
       throw new Error("No hay pacientes en la lista de espera.");
     }
 
-    const proximoIngreso = ingresosPendientes[0];
-    proximoIngreso.cambiarEstado(EstadoIngreso.EN_PROCESO);
+    const normalizar = (valor: string): string =>
+      valor.replace(/\D/g, "");
 
-    return proximoIngreso;
+    const ingresoObjetivo: Ingreso | undefined =
+      cuilPaciente && cuilPaciente.trim() !== ""
+        ? ingresosPendientes.find(
+            (ingreso) =>
+              normalizar(ingreso.CuilPaciente) === normalizar(cuilPaciente),
+          )
+        : ingresosPendientes[0];
+
+    if (!ingresoObjetivo) {
+      throw new Error("No se encontró el paciente seleccionado en espera.");
+    }
+
+    ingresoObjetivo.asignarDoctor(doctor);
+    return ingresoObjetivo;
+  }
+
+  public reclamarProximoPaciente(doctor: Doctor): Ingreso {
+    return this.reclamarPaciente(doctor);
   }
 }

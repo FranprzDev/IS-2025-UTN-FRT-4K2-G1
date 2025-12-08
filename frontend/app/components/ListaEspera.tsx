@@ -16,7 +16,9 @@ export default function ListaEspera({ refreshTrigger }: { refreshTrigger: number
     const [ingresos, setIngresos] = useState<Ingreso[]>([]);
     const [userRole, setUserRole] = useState<string>('');
     const [message, setMessage] = useState('');
-    const [showDoctorForm, setShowDoctorForm] = useState(false);
+    const [loadingCuil, setLoadingCuil] = useState<string>('');
+    const [toastType, setToastType] = useState<'success' | 'error'>('success');
+    const [selectedIngresoCuil, setSelectedIngresoCuil] = useState<string>('');
     const [doctorData, setDoctorData] = useState({
         nombre: '',
         apellido: '',
@@ -30,6 +32,14 @@ export default function ListaEspera({ refreshTrigger }: { refreshTrigger: number
             try {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 setUserRole(payload.rol || '');
+                const email: string = payload.email || '';
+                const baseName = email.split('@')[0] || 'medico';
+                setDoctorData({
+                    nombre: baseName,
+                    apellido: 'Cuenta',
+                    cuil: '20123456789',
+                    matricula: 'MAT-DEFAULT'
+                });
             } catch (error) {
                 console.error('Error decodificando token:', error);
             }
@@ -52,11 +62,14 @@ export default function ListaEspera({ refreshTrigger }: { refreshTrigger: number
         }
     };
 
-    const handleReclamarPaciente = async () => {
-        if (!doctorData.nombre || !doctorData.apellido || !doctorData.cuil || !doctorData.matricula) {
-            setShowDoctorForm(true);
-            return;
+    const handleReclamarPaciente = async (ingresoCuil?: string) => {
+        if (ingresoCuil) {
+            setSelectedIngresoCuil(ingresoCuil);
         }
+        const objetivo = ingresoCuil || selectedIngresoCuil;
+        setLoadingCuil(objetivo);
+        setMessage(`Reclamando paciente ${objetivo || ''}...`);
+        setToastType('success');
 
         const token = localStorage.getItem('token');
         try {
@@ -66,35 +79,33 @@ export default function ListaEspera({ refreshTrigger }: { refreshTrigger: number
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(doctorData)
+                body: JSON.stringify({
+                    ...doctorData,
+                    ingresoCuil: ingresoCuil || selectedIngresoCuil
+                })
             });
 
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
 
-            setMessage('Paciente reclamado exitosamente');
+            setMessage(`Paciente ${objetivo || ''} reclamado exitosamente`);
+            setToastType('success');
             setTimeout(() => {
                 setMessage('');
-                window.location.reload();
+                setIngresos(prev => prev.filter(ingreso => ingreso.paciente.cuil.valor !== (ingresoCuil || selectedIngresoCuil)));
             }, 2000);
         } catch (err: any) {
+            setToastType('error');
             setMessage('Error: ' + err.message);
         }
+        setLoadingCuil('');
     };
 
     return (
+        <>
         <div className="card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h3 className="title" style={{ fontSize: '1.5rem', margin: 0 }}>Lista de Espera</h3>
-                {userRole === 'medico' && (
-                    <button
-                        onClick={handleReclamarPaciente}
-                        className="btn btn-primary"
-                        style={{ padding: '0.5rem 1rem' }}
-                    >
-                        Reclamar Próximo Paciente
-                    </button>
-                )}
             </div>
 
             {message && (
@@ -102,75 +113,24 @@ export default function ListaEspera({ refreshTrigger }: { refreshTrigger: number
                     padding: '0.75rem',
                     borderRadius: '0.5rem',
                     marginBottom: '1rem',
-                    background: message.startsWith('Error') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)',
-                    color: message.startsWith('Error') ? 'var(--error)' : 'var(--success)'
+                    background: toastType === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)',
+                    color: toastType === 'error' ? 'var(--error)' : 'var(--success)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
                 }}>
-                    {message}
-                </div>
-            )}
-
-            {showDoctorForm && (
-                <div style={{
-                    padding: '1.5rem',
-                    background: 'var(--card-bg)',
-                    border: '1px solid var(--card-border)',
-                    borderRadius: '0.5rem',
-                    marginBottom: '1rem'
-                }}>
-                    <h4 style={{ marginTop: 0, marginBottom: '1rem' }}>Datos del Médico</h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <input
-                            type="text"
-                            placeholder="Nombre"
-                            value={doctorData.nombre}
-                            onChange={(e) => setDoctorData({ ...doctorData, nombre: e.target.value })}
-                            className="input"
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="Apellido"
-                            value={doctorData.apellido}
-                            onChange={(e) => setDoctorData({ ...doctorData, apellido: e.target.value })}
-                            className="input"
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="CUIL (XX-XXXXXXXX-X)"
-                            value={doctorData.cuil}
-                            onChange={(e) => setDoctorData({ ...doctorData, cuil: e.target.value })}
-                            className="input"
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="Matrícula"
-                            value={doctorData.matricula}
-                            onChange={(e) => setDoctorData({ ...doctorData, matricula: e.target.value })}
-                            className="input"
-                            required
-                        />
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                        <button
-                            onClick={() => {
-                                if (doctorData.nombre && doctorData.apellido && doctorData.cuil && doctorData.matricula) {
-                                    handleReclamarPaciente();
-                                }
-                            }}
-                            className="btn btn-primary"
-                        >
-                            Confirmar y Reclamar
-                        </button>
-                        <button
-                            onClick={() => setShowDoctorForm(false)}
-                            className="btn"
-                            style={{ background: 'var(--card-border)' }}
-                        >
-                            Cancelar
-                        </button>
-                    </div>
+                    {loadingCuil && toastType !== 'error' && (
+                        <span className="spinner" style={{
+                            width: '16px',
+                            height: '16px',
+                            border: '2px solid var(--primary)',
+                            borderTopColor: 'transparent',
+                            borderRadius: '50%',
+                            display: 'inline-block',
+                            animation: 'spin 0.8s linear infinite'
+                        }} />
+                    )}
+                    <span>{message}</span>
                 </div>
             )}
 
@@ -207,7 +167,28 @@ export default function ListaEspera({ refreshTrigger }: { refreshTrigger: number
                                             {ingreso.nivelEmergencia.descripcion}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '1rem' }}>{new Date().toLocaleDateString()}</td>
+                                    <td style={{ padding: '1rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <span>{new Date().toLocaleDateString()}</span>
+                                            {userRole === 'medico' && (
+                                                <button
+                                                    onClick={() => handleReclamarPaciente(ingreso.paciente.cuil.valor)}
+                                                    className="btn"
+                                                    style={{
+                                                        padding: '0.35rem 0.5rem',
+                                                        minWidth: '2.5rem',
+                                                        background: 'rgba(59,130,246,0.15)',
+                                                        opacity: loadingCuil === ingreso.paciente.cuil.valor ? 0.6 : 1,
+                                                        cursor: loadingCuil === ingreso.paciente.cuil.valor ? 'wait' : 'pointer'
+                                                    }}
+                                                    aria-label="Reclamar paciente"
+                                                    disabled={loadingCuil === ingreso.paciente.cuil.valor}
+                                                >
+                                                    {loadingCuil === ingreso.paciente.cuil.valor ? '...' : '⚡'}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
                                 </tr>
                             ))
                         )}
@@ -215,5 +196,12 @@ export default function ListaEspera({ refreshTrigger }: { refreshTrigger: number
                 </table>
             </div>
         </div>
+        <style jsx>{`
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `}</style>
+        </>
     );
 }

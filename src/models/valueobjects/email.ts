@@ -4,8 +4,9 @@ export class Email {
   private valor: string;
 
   public constructor(valor: string) {
-    this.validarFormato(valor);
-    this.valor = valor;
+    const normalizado: string = valor.trim().toLowerCase();
+    this.validarFormato(normalizado);
+    this.valor = normalizado;
   }
 
   private validarFormato(email: string): void {
