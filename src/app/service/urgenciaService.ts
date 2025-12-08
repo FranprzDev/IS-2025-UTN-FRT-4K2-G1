@@ -1,7 +1,9 @@
 import { RepoPacientes } from "../interface/repoPacientes.js";
 import { Ingreso } from "../../models/ingreso.js";
 import { Enfermera } from "../../models/enfermera.js";
+import { Doctor } from "../../models/doctor.js";
 import { NivelEmergencia } from "../../models/nivelEmergencia.js";
+import { EstadoIngreso } from "../../models/estadoIngreso.js";
 import { Temperatura } from "../../models/valueobjects/temperatura.js";
 import { FrecuenciaCardiaca } from "../../models/valueobjects/frecuenciaCardiaca.js";
 import { FrecuenciaRespiratoria } from "../../models/valueobjects/frecuenciaRespiratoria.js";
@@ -62,6 +64,68 @@ export class UrgenciaService {
   }
 
   public obtenerIngresosPendientes(): Ingreso[] {
-    return [...this.listaEspera];
+    return this.obtenerIngresosPendientesOrdenados();
+  }
+
+  public reclamarPaciente(doctor: Doctor, cuilPaciente?: string): Ingreso {
+    this.validarDisponibilidadDelDoctor(doctor);
+    const ingresosPendientes: Ingreso[] =
+      this.obtenerIngresosPendientesOrdenados();
+
+    if (ingresosPendientes.length === 0) {
+      throw new Error("No hay pacientes en la lista de espera.");
+    }
+
+    const ingresoObjetivo: Ingreso | undefined =
+      cuilPaciente && cuilPaciente.trim() !== ""
+        ? ingresosPendientes.find(
+            (ingreso) =>
+              this.normalizarCuil(ingreso.CuilPaciente) ===
+              this.normalizarCuil(cuilPaciente),
+          )
+        : ingresosPendientes[0];
+
+    if (!ingresoObjetivo) {
+      throw new Error("No se encontró el paciente seleccionado en espera.");
+    }
+
+    ingresoObjetivo.asignarDoctor(doctor);
+    return ingresoObjetivo;
+  }
+
+  public reclamarProximoPaciente(doctor: Doctor): Ingreso {
+    return this.reclamarPaciente(doctor);
+  }
+
+  public obtenerIngresosDelDoctor(email: string): Ingreso[] {
+    return this.listaEspera.filter(
+      (ingreso) =>
+        ingreso.DoctorAsignado !== null &&
+        ingreso.DoctorAsignado.Email.Valor === email,
+    );
+  }
+
+  private validarDisponibilidadDelDoctor(doctor: Doctor): void {
+    const tieneIngresoEnProceso: boolean = this.listaEspera.some(
+      (ingreso) =>
+        ingreso.DoctorAsignado !== null &&
+        ingreso.DoctorAsignado.Email.Valor === doctor.Email.Valor &&
+        ingreso.Estado === EstadoIngreso.EN_PROCESO,
+    );
+    if (tieneIngresoEnProceso) {
+      throw new Error("El médico ya tiene un paciente en proceso.");
+    }
+  }
+
+  private obtenerIngresosPendientesOrdenados(): Ingreso[] {
+    const pendientes: Ingreso[] = this.listaEspera.filter(
+      (ingreso) => ingreso.Estado === EstadoIngreso.PENDIENTE,
+    );
+    pendientes.sort((a, b) => a.compararCon(b));
+    return pendientes;
+  }
+
+  private normalizarCuil(valor: string): string {
+    return valor.replace(/\D/g, "");
   }
 }

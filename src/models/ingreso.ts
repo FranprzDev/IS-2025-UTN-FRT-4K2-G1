@@ -6,6 +6,7 @@ import { TensionArterial } from "./valueobjects/tensionArterial.js";
 import { FrecuenciaCardiaca } from "./valueobjects/frecuenciaCardiaca.js";
 import { FrecuenciaRespiratoria } from "./valueobjects/frecuenciaRespiratoria.js";
 import { Temperatura } from "./valueobjects/temperatura.js";
+import { Doctor } from "./doctor.js";
 
 interface IngresoArgs {
   paciente: Paciente;
@@ -31,6 +32,7 @@ export class Ingreso {
   private frecuenciaCardiaca: FrecuenciaCardiaca;
   private frecuenciaRespiratoria: FrecuenciaRespiratoria;
   private tensionArterial: TensionArterial;
+  private doctor: Doctor | null;
 
   public constructor(args: IngresoArgs) {
     this.paciente = args.paciente;
@@ -48,6 +50,7 @@ export class Ingreso {
       args.frecuenciaSistolica,
       args.frecuenciaDiastolica,
     );
+    this.doctor = null;
   }
 
   public compararCon(ingreso: Ingreso): number {
@@ -77,8 +80,20 @@ export class Ingreso {
     return this.estado;
   }
 
+  get DoctorAsignado(): Doctor | null {
+    return this.doctor;
+  }
+
   public cambiarEstado(nuevoEstado: EstadoIngreso): void {
     this.estado = nuevoEstado;
+  }
+
+  public asignarDoctor(doctor: Doctor): void {
+    if (this.estado === EstadoIngreso.EN_PROCESO || this.doctor) {
+      throw new Error("El paciente ya está siendo atendido por otro médico.");
+    }
+    this.doctor = doctor;
+    this.estado = EstadoIngreso.EN_PROCESO;
   }
 
   public toJSON(): object {
@@ -93,6 +108,7 @@ export class Ingreso {
       frecuenciaCardiaca: this.frecuenciaCardiaca,
       frecuenciaRespiratoria: this.frecuenciaRespiratoria,
       tensionArterial: this.tensionArterial,
+      doctor: this.doctor,
     };
   }
 }

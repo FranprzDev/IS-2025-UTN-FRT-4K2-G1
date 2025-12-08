@@ -5,6 +5,8 @@ import { DBPruebaEnMemoria } from "../../src/test/mocks/DBPruebaEnMemoria.js";
 import { Paciente } from "../../src/models/paciente.js";
 import { Enfermera } from "../../src/models/enfermera.js";
 import { NivelEmergencia } from "../../src/models/nivelEmergencia.js";
+import { Doctor } from "../../src/models/doctor.js";
+import { EstadoIngreso } from "../../src/models/estadoIngreso.js";
 import { Email } from "../../src/models/valueobjects/email.js";
 import { Cuil } from "../../src/models/valueobjects/cuil.js";
 import { Afiliado } from "../../src/models/afiliado.js";
@@ -219,6 +221,108 @@ describe("UrgenciaService", () => {
 
       expect(ingresos1).to.not.equal(ingresos2);
       expect(ingresos1).to.deep.equal(ingresos2);
+    });
+  });
+
+  describe("reclamarPaciente", () => {
+    it("deberia tomar el paciente con mayor prioridad y pasarlo a EN_PROCESO", () => {
+      setupTestData();
+      servicioUrgencias.registrarUrgencia({
+        cuil: "23123456789",
+        enfermera,
+        informe: "Paciente en emergencia",
+        nivelEmergencia: NivelEmergencia.EMERGENCIA,
+        temperatura: 37.8,
+        frecuenciaCardiaca: 90,
+        frecuenciaRespiratoria: 18,
+        frecuenciaSistolica: 125,
+        frecuenciaDiastolica: 82,
+      });
+      servicioUrgencias.registrarUrgencia({
+        cuil: "27876543213",
+        enfermera,
+        informe: "Paciente critico",
+        nivelEmergencia: NivelEmergencia.CRITICA,
+        temperatura: 38.5,
+        frecuenciaCardiaca: 105,
+        frecuenciaRespiratoria: 22,
+        frecuenciaSistolica: 140,
+        frecuenciaDiastolica: 90,
+      });
+      const doctor: Doctor = new Doctor(
+        new Cuil("20999999999"),
+        "Carlos",
+        "Medico",
+        new Email("doctor@example.com"),
+        "MAT12345",
+      );
+
+      const ingresoReclamado = servicioUrgencias.reclamarPaciente(doctor);
+
+      expect(ingresoReclamado.CuilPaciente).to.equal("27-87654321-3");
+      expect(ingresoReclamado.Estado).to.equal(EstadoIngreso.EN_PROCESO);
+      expect(ingresoReclamado.DoctorAsignado).to.not.be.null;
+      expect(ingresoReclamado.DoctorAsignado?.Email.Valor).to.equal(
+        doctor.Email.Valor,
+      );
+      const pendientes = servicioUrgencias.obtenerIngresosPendientes();
+      expect(pendientes.map((ingreso) => ingreso.CuilPaciente)).to.not.include(
+        ingresoReclamado.CuilPaciente,
+      );
+    });
+
+    it("deberia lanzar error cuando no hay pacientes pendientes", () => {
+      setupTestData();
+      const doctor: Doctor = new Doctor(
+        new Cuil("20999999999"),
+        "Carlos",
+        "Medico",
+        new Email("doctor@example.com"),
+        "MAT12345",
+      );
+
+      expect(() => servicioUrgencias.reclamarPaciente(doctor)).to.throw(
+        "No hay pacientes en la lista de espera.",
+      );
+    });
+
+    it("deberia impedir reclamar si el medico ya tiene un ingreso en proceso", () => {
+      setupTestData();
+      servicioUrgencias.registrarUrgencia({
+        cuil: "23123456789",
+        enfermera,
+        informe: "Paciente en emergencia",
+        nivelEmergencia: NivelEmergencia.EMERGENCIA,
+        temperatura: 37.8,
+        frecuenciaCardiaca: 90,
+        frecuenciaRespiratoria: 18,
+        frecuenciaSistolica: 125,
+        frecuenciaDiastolica: 82,
+      });
+      servicioUrgencias.registrarUrgencia({
+        cuil: "27876543213",
+        enfermera,
+        informe: "Paciente critico",
+        nivelEmergencia: NivelEmergencia.CRITICA,
+        temperatura: 38.5,
+        frecuenciaCardiaca: 105,
+        frecuenciaRespiratoria: 22,
+        frecuenciaSistolica: 140,
+        frecuenciaDiastolica: 90,
+      });
+      const doctor: Doctor = new Doctor(
+        new Cuil("20999999999"),
+        "Carlos",
+        "Medico",
+        new Email("doctor@example.com"),
+        "MAT12345",
+      );
+
+      servicioUrgencias.reclamarPaciente(doctor);
+
+      expect(() => servicioUrgencias.reclamarPaciente(doctor)).to.throw(
+        "El médico ya tiene un paciente en proceso.",
+      );
     });
   });
 });

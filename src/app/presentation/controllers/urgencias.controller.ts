@@ -23,16 +23,29 @@ export class UrgenciasController {
     try {
       const { nombre, apellido, cuil, obraSocial, email, numeroAfiliado, calle, numero, localidad } = req.body;
       
+      if (!cuil || cuil.trim() === "") {
+        res.status(400).json({ error: 'Se debe completar el campo: Cuil' });
+        return;
+      }
+      if (!apellido || apellido.trim() === "") {
+        res.status(400).json({ error: 'Se debe completar el campo: Apellido' });
+        return;
+      }
+      if (!nombre || nombre.trim() === "") {
+        res.status(400).json({ error: 'Se debe completar el campo: Nombre' });
+        return;
+      }
+      if (!calle || calle.trim() === "" || !numero || numero.trim() === "" || !localidad || localidad.trim() === "") {
+        res.status(400).json({ error: 'Se debe completar el campo: Domicilio' });
+        return;
+      }
+      
       const cuilSanitized = cuil.replace(/\D/g, '');
       const cuilObj: Cuil = new Cuil(cuilSanitized);
       const emailObj: Email = new Email(email || `${nombre.toLowerCase()}.${apellido.toLowerCase()}@example.com`);
-      const obraSocialObj: ObraSocial = new ObraSocial("1", obraSocial);
+      const obraSocialObj: ObraSocial = new ObraSocial("1", obraSocial || "");
       const afiliado: Afiliado = new Afiliado(obraSocialObj, numeroAfiliado || "00000000");
-      const domicilio: Domicilio = new Domicilio(
-        calle || "Sin especificar",
-        numero || "0",
-        localidad || "San Miguel de Tucumán"
-      );
+      const domicilio: Domicilio = new Domicilio(calle, numero, localidad);
       
       const paciente: Paciente = new Paciente(cuilObj, nombre, apellido, emailObj, afiliado, domicilio);
       this.repoPacientes.guardarPaciente(paciente);
@@ -92,7 +105,17 @@ export class UrgenciasController {
   public async obtenerListaEspera(req: Request, res: Response): Promise<void> {
     try {
       const ingresosPendientes = this.urgenciaService.obtenerIngresosPendientes();
-      res.status(200).json(ingresosPendientes);
+      res.status(200).json(ingresosPendientes.map((ingreso) => ingreso.toJSON()));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      res.status(500).json({ error: errorMessage });
+    }
+  }
+
+  public async obtenerTodosLosPacientes(req: Request, res: Response): Promise<void> {
+    try {
+      const pacientes = this.repoPacientes.obtenerTodos();
+      res.status(200).json(pacientes);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       res.status(500).json({ error: errorMessage });

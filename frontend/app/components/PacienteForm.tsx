@@ -18,7 +18,7 @@ export default function PacienteForm({ onSuccess }: { onSuccess: (cuil: string) 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Submitting PacienteForm...');
+        console.log('Submitting PacienteForm...', formData);
         const token = localStorage.getItem('token');
         try {
             const res = await fetch('/api/urgencias/crear-paciente', {
@@ -49,15 +49,15 @@ export default function PacienteForm({ onSuccess }: { onSuccess: (cuil: string) 
             <h3 className="title" style={{ fontSize: '1.5rem' }}>Nuevo Paciente</h3>
             {message && <p style={{ color: message.startsWith('Error') ? 'var(--error)' : 'var(--success)' }}>{message}</p>}
             <form onSubmit={handleSubmit} className="grid grid-2">
-                <input name="nombre" placeholder="Nombre" className="input" onChange={handleChange} required />
-                <input name="apellido" placeholder="Apellido" className="input" onChange={handleChange} required />
-                <input name="cuil" placeholder="CUIL (XX-XXXXXXXX-X)" className="input" onChange={handleChange} required />
-                <input name="email" type="email" placeholder="Email" className="input" onChange={handleChange} />
-                <input name="obraSocial" placeholder="Obra Social" className="input" onChange={handleChange} required />
-                <input name="numeroAfiliado" placeholder="N° Afiliado" className="input" onChange={handleChange} />
-                <input name="calle" placeholder="Calle" className="input" onChange={handleChange} />
-                <input name="numero" placeholder="Número" className="input" onChange={handleChange} />
-                <input name="localidad" placeholder="Localidad" className="input" onChange={handleChange} />
+                <input name="nombre" value={formData.nombre} placeholder="Nombre" className="input" onChange={handleChange} required />
+                <input name="apellido" value={formData.apellido} placeholder="Apellido" className="input" onChange={handleChange} required />
+                <input name="cuil" value={formData.cuil} placeholder="CUIL (XX-XXXXXXXX-X)" className="input" onChange={handleChange} required />
+                <input name="email" type="email" value={formData.email} placeholder="Email" className="input" onChange={handleChange} />
+                <input name="obraSocial" value={formData.obraSocial} placeholder="Obra Social" className="input" onChange={handleChange} required />
+                <input name="numeroAfiliado" value={formData.numeroAfiliado} placeholder="N° Afiliado" className="input" onChange={handleChange} />
+                <input name="calle" value={formData.calle} placeholder="Calle" className="input" onChange={handleChange} />
+                <input name="numero" value={formData.numero} placeholder="Número" className="input" onChange={handleChange} />
+                <input name="localidad" value={formData.localidad} placeholder="Localidad" className="input" onChange={handleChange} />
                 <div style={{ gridColumn: '1 / -1' }}>
                     <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Crear Paciente</button>
                 </div>
