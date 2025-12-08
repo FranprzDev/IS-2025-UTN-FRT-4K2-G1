@@ -41,6 +41,9 @@ export default function ListaEspera({
     cuil: "",
     matricula: "",
   });
+  const [atencionCuil, setAtencionCuil] = useState<string>("");
+  const [atencionInforme, setAtencionInforme] = useState<string>("");
+  const [atencionLoading, setAtencionLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -123,6 +126,12 @@ export default function ListaEspera({
     [estadoEsEnProceso, ingresosAsignados],
   );
 
+  const ingresosEnProceso = useMemo(
+    () =>
+      ingresosAsignados.filter((ingreso) => estadoEsEnProceso(ingreso.estado)),
+    [estadoEsEnProceso, ingresosAsignados],
+  );
+
   const getNivelColor = (nivel: string) => {
     switch (nivel) {
       case "Critica":
@@ -184,6 +193,55 @@ export default function ListaEspera({
       setMessage("Error: " + err.message);
     }
     setLoadingCuil("");
+  };
+
+  const handleRegistrarAtencion = async () => {
+    if (!userRole) {
+      setToastType("error");
+      setMessage("Debe iniciar sesión para registrar la atención");
+      return;
+    }
+    if (!atencionCuil || atencionCuil.trim() === "") {
+      setToastType("error");
+      setMessage("Debe seleccionar un paciente en proceso");
+      return;
+    }
+    if (!atencionInforme || atencionInforme.trim() === "") {
+      setToastType("error");
+      setMessage("Debe completar el informe de atención");
+      return;
+    }
+    setAtencionLoading(true);
+    setToastType("success");
+    setMessage("Registrando atención...");
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch("/api/atencion/registrar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token || ""}`,
+        },
+        body: JSON.stringify({
+          ingresoCuil: atencionCuil,
+          informe: atencionInforme,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Error al registrar la atención");
+      }
+      setToastType("success");
+      setMessage("Atención registrada exitosamente");
+      setAtencionInforme("");
+      setAtencionCuil("");
+      await cargarIngresos();
+      await cargarMisIngresos();
+    } catch (err: any) {
+      setToastType("error");
+      setMessage("Error: " + err.message);
+    }
+    setAtencionLoading(false);
   };
 
   return (
@@ -417,6 +475,61 @@ export default function ListaEspera({
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+      {userRole === "medico" && ingresosEnProceso.length > 0 && (
+        <div className="card" style={{ marginTop: "1rem" }}>
+          <h3 className="title" style={{ fontSize: "1.5rem", margin: 0 }}>
+            Registrar Atención
+          </h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr",
+              gap: "0.75rem",
+              marginTop: "1rem",
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+              <label style={{ fontWeight: 600 }}>Paciente en proceso</label>
+              <select
+                value={atencionCuil}
+                onChange={(e) => setAtencionCuil(e.target.value)}
+                style={{ padding: "0.65rem", borderRadius: "0.5rem", border: "1px solid var(--card-border)", background: "transparent", color: "var(--foreground)" }}
+              >
+                <option value="">Seleccionar</option>
+                {ingresosEnProceso.map((ingreso) => (
+                  <option key={ingreso.paciente.cuil.valor} value={ingreso.paciente.cuil.valor}>
+                    {ingreso.paciente.nombre} {ingreso.paciente.apellido} - {ingreso.paciente.cuil.valor}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+              <label style={{ fontWeight: 600 }}>Informe</label>
+              <textarea
+                value={atencionInforme}
+                onChange={(e) => setAtencionInforme(e.target.value)}
+                rows={4}
+                style={{
+                  padding: "0.75rem",
+                  borderRadius: "0.5rem",
+                  border: "1px solid var(--card-border)",
+                  background: "transparent",
+                  color: "var(--foreground)",
+                  resize: "vertical",
+                }}
+              />
+            </div>
+            <button
+              className="btn btn-primary"
+              onClick={handleRegistrarAtencion}
+              disabled={atencionLoading}
+              style={{ padding: "0.75rem", fontWeight: 600 }}
+            >
+              {atencionLoading ? "Registrando..." : "Registrar Atención"}
+            </button>
           </div>
         </div>
       )}

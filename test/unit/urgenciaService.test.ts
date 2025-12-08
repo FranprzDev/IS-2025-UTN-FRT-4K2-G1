@@ -325,4 +325,106 @@ describe("UrgenciaService", () => {
       );
     });
   });
+
+  describe("registrarAtencion", () => {
+    it("deberia finalizar el ingreso y registrar la atencion", () => {
+      setupTestData();
+      servicioUrgencias.registrarUrgencia({
+        cuil: "23123456789",
+        enfermera,
+        informe: "Paciente en emergencia",
+        nivelEmergencia: NivelEmergencia.EMERGENCIA,
+        temperatura: 37.8,
+        frecuenciaCardiaca: 90,
+        frecuenciaRespiratoria: 18,
+        frecuenciaSistolica: 125,
+        frecuenciaDiastolica: 82,
+      });
+      const doctor: Doctor = new Doctor(
+        new Cuil("20999999999"),
+        "Carlos",
+        "Medico",
+        new Email("doctor@example.com"),
+        "MAT12345",
+      );
+      servicioUrgencias.reclamarPaciente(doctor, "23123456789");
+      const atencion = servicioUrgencias.registrarAtencion(
+        doctor,
+        "23123456789",
+        "Informe final",
+      );
+      const ingresos = servicioUrgencias.obtenerIngresosDelDoctor(
+        doctor.Email.Valor,
+      );
+      expect(ingresos[0]?.Estado).to.equal(EstadoIngreso.FINALIZADO);
+      const atenciones = servicioUrgencias.obtenerAtencionesDelDoctor(
+        doctor.Email.Valor,
+      );
+      expect(atenciones).to.have.length(1);
+      expect(atencion.Informe).to.equal("Informe final");
+    });
+
+    it("deberia lanzar error cuando el informe esta vacio", () => {
+      setupTestData();
+      servicioUrgencias.registrarUrgencia({
+        cuil: "23123456789",
+        enfermera,
+        informe: "Paciente en emergencia",
+        nivelEmergencia: NivelEmergencia.EMERGENCIA,
+        temperatura: 37.8,
+        frecuenciaCardiaca: 90,
+        frecuenciaRespiratoria: 18,
+        frecuenciaSistolica: 125,
+        frecuenciaDiastolica: 82,
+      });
+      const doctor: Doctor = new Doctor(
+        new Cuil("20999999999"),
+        "Carlos",
+        "Medico",
+        new Email("doctor@example.com"),
+        "MAT12345",
+      );
+      servicioUrgencias.reclamarPaciente(doctor, "23123456789");
+      expect(() =>
+        servicioUrgencias.registrarAtencion(doctor, "23123456789", " "),
+      ).to.throw("Se ha omitido el informe de la atención");
+    });
+
+    it("deberia impedir registrar atencion si el medico no es el asignado", () => {
+      setupTestData();
+      servicioUrgencias.registrarUrgencia({
+        cuil: "23123456789",
+        enfermera,
+        informe: "Paciente en emergencia",
+        nivelEmergencia: NivelEmergencia.EMERGENCIA,
+        temperatura: 37.8,
+        frecuenciaCardiaca: 90,
+        frecuenciaRespiratoria: 18,
+        frecuenciaSistolica: 125,
+        frecuenciaDiastolica: 82,
+      });
+      const doctorAsignado: Doctor = new Doctor(
+        new Cuil("20999999999"),
+        "Carlos",
+        "Medico",
+        new Email("doctor@example.com"),
+        "MAT12345",
+      );
+      servicioUrgencias.reclamarPaciente(doctorAsignado, "23123456789");
+      const doctorExterno: Doctor = new Doctor(
+        new Cuil("20911111111"),
+        "Laura",
+        "Externa",
+        new Email("externa@example.com"),
+        "MAT54321",
+      );
+      expect(() =>
+        servicioUrgencias.registrarAtencion(
+          doctorExterno,
+          "23123456789",
+          "Informe",
+        ),
+      ).to.throw("Solo puede registrar la atención el médico asignado.");
+    });
+  });
 });

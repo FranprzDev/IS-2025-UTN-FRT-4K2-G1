@@ -3,9 +3,11 @@ import cors from 'cors';
 import { crearUrgenciasRouter } from './src/app/presentation/routes/urgencias.routes.js';
 import { crearAuthRouter } from './src/app/presentation/routes/auth.routes.js';
 import { crearReclamoRouter } from './src/app/presentation/routes/reclamo.routes.js';
+import { crearAtencionRouter } from './src/app/presentation/routes/atencion.routes.js';
 import { UrgenciasController } from './src/app/presentation/controllers/urgencias.controller.js';
 import { AuthController } from './src/app/presentation/controllers/auth.controller.js';
 import { ReclamoController } from './src/app/presentation/controllers/reclamo.controller.js';
+import { AtencionController } from './src/app/presentation/controllers/atencion.controller.js';
 import { UrgenciaService } from './src/app/service/urgenciaService.js';
 import { AuthService } from './src/app/service/authService.js';
 import { DBPruebaEnMemoria } from './src/test/mocks/DBPruebaEnMemoria.js';
@@ -39,10 +41,12 @@ const authService = new AuthService(repoUsuarios, passwordHasher, jwtProvider);
 const urgenciasController = new UrgenciasController(urgenciaService, repoPacientes);
 const authController = new AuthController(authService);
 const reclamoController = new ReclamoController(urgenciaService);
+const atencionController = new AtencionController(urgenciaService);
 
 app.use('/api/urgencias', crearUrgenciasRouter(urgenciasController));
 app.use('/api/auth', crearAuthRouter(authController, jwtProvider));
 app.use('/api/reclamo', crearReclamoRouter(reclamoController, jwtProvider));
+app.use('/api/atencion', crearAtencionRouter(atencionController, jwtProvider));
 
 const inicializarUsuariosPorDefecto = async (): Promise<void> => {
   try {

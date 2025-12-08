@@ -8,6 +8,7 @@ import { Temperatura } from "../../models/valueobjects/temperatura.js";
 import { FrecuenciaCardiaca } from "../../models/valueobjects/frecuenciaCardiaca.js";
 import { FrecuenciaRespiratoria } from "../../models/valueobjects/frecuenciaRespiratoria.js";
 import { TensionArterial } from "../../models/valueobjects/tensionArterial.js";
+import { Atencion } from "../../models/atencion.js";
 
 interface RegistrarUrgenciaArgs {
   cuil: string;
@@ -24,6 +25,7 @@ interface RegistrarUrgenciaArgs {
 export class UrgenciaService {
   private repoPacientes: RepoPacientes;
   private listaEspera: Ingreso[] = [];
+  private atenciones: Atencion[] = [];
 
   public constructor(repoPacientes: RepoPacientes) {
     this.repoPacientes = repoPacientes;
@@ -67,6 +69,28 @@ export class UrgenciaService {
     return this.obtenerIngresosPendientesOrdenados();
   }
 
+  public registrarAtencion(
+    doctor: Doctor,
+    cuilPaciente: string,
+    informe: string,
+  ): Atencion {
+    const ingresoObjetivo: Ingreso = this.buscarIngresoAsignado(
+      cuilPaciente,
+      doctor,
+    );
+    if (ingresoObjetivo.Estado === EstadoIngreso.FINALIZADO) {
+      throw new Error("El ingreso ya fue finalizado.");
+    }
+    const atencion = new Atencion({
+      ingreso: ingresoObjetivo,
+      informe,
+      doctor,
+    });
+    ingresoObjetivo.cambiarEstado(EstadoIngreso.FINALIZADO);
+    this.atenciones.push(atencion);
+    return atencion;
+  }
+
   public reclamarPaciente(doctor: Doctor, cuilPaciente?: string): Ingreso {
     this.validarDisponibilidadDelDoctor(doctor);
     const ingresosPendientes: Ingreso[] =
@@ -105,6 +129,12 @@ export class UrgenciaService {
     );
   }
 
+  public obtenerAtencionesDelDoctor(email: string): Atencion[] {
+    return this.atenciones.filter(
+      (atencion) => atencion.Doctor.Email.Valor === email,
+    );
+  }
+
   private validarDisponibilidadDelDoctor(doctor: Doctor): void {
     const tieneIngresoEnProceso: boolean = this.listaEspera.some(
       (ingreso) =>
@@ -127,5 +157,29 @@ export class UrgenciaService {
 
   private normalizarCuil(valor: string): string {
     return valor.replace(/\D/g, "");
+  }
+
+  private buscarIngresoAsignado(
+    cuilPaciente: string,
+    doctor: Doctor,
+  ): Ingreso {
+    const cuilNormalizado: string = this.normalizarCuil(cuilPaciente);
+    const ingresoObjetivo = this.listaEspera.find(
+      (ingreso) =>
+        this.normalizarCuil(ingreso.CuilPaciente) === cuilNormalizado,
+    );
+    if (!ingresoObjetivo) {
+      throw new Error("No se encontró el ingreso solicitado.");
+    }
+    if (!ingresoObjetivo.DoctorAsignado) {
+      throw new Error("El paciente no tiene un médico asignado.");
+    }
+    if (ingresoObjetivo.DoctorAsignado.Email.Valor !== doctor.Email.Valor) {
+      throw new Error("Solo puede registrar la atención el médico asignado.");
+    }
+    if (ingresoObjetivo.Estado !== EstadoIngreso.EN_PROCESO) {
+      throw new Error("El ingreso no está en proceso de atención.");
+    }
+    return ingresoObjetivo;
   }
 }
