@@ -10,6 +10,7 @@ import { Email } from "../../../src/models/valueobjects/email.js";
 import { Afiliado } from "../../../src/models/afiliado.js";
 import { ObraSocial } from "../../../src/models/obraSocial.js";
 import { Domicilio } from "../../../src/models/domicilio.js";
+import { mensajesContexto } from "./sharedMessages.js";
 
 let enfermera: Enfermera | null = null;
 let dbMockeada: DBPruebaEnMemoria | null = null;
@@ -107,6 +108,10 @@ When("Ingresan a urgencias los siguientes pacientes:", function (dataTable) {
       break;
     }
   }
+  mensajesContexto.ultimoMensaje = excepcionEsperada
+    ? excepcionEsperada.message
+    : null;
+  mensajesContexto.ultimoError = excepcionEsperada;
 });
 
 Then(
@@ -161,17 +166,3 @@ Then("el paciente entra en la cola de atención con estado {string}", function (
   const ultimoIngreso = ingresos[ingresos.length - 1];
   expect(ultimoIngreso?.Estado).to.equal(estado);
 });
-
-Then("el sistema muestra el siguiente mensaje: {string}", function (mensaje: string) {
-  expect(excepcionEsperada).to.not.be.null;
-  expect(excepcionEsperada!.message).to.equal(mensaje);
-});
-
-
-Then(
-  "el sistema muestra el siguiente error: {string}",
-  function (mensaje: string) {
-    expect(excepcionEsperada).to.not.be.null;
-    expect(excepcionEsperada!.message).to.equal(mensaje);
-  },
-);

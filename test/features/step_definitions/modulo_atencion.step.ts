@@ -14,10 +14,9 @@ import { Domicilio } from "../../../src/models/domicilio.js";
 import { EstadoIngreso } from "../../../src/models/estadoIngreso.js";
 import { Atencion } from "../../../src/models/atencion.js";
 import { Ingreso } from "../../../src/models/ingreso.js";
+import { escenarioMedicoContexto } from "./sharedContext.js";
+import { mensajesContexto } from "./sharedMessages.js";
 
-let doctor: Doctor | null = null;
-let dbMockeada: DBPruebaEnMemoria | null = null;
-let servicioUrgencias: UrgenciaService | null = null;
 let atencionRegistrada: Atencion | null = null;
 let excepcionEsperada: Error | null = null;
 
@@ -43,10 +42,18 @@ Given("que el siguiente médico esta registrado:", function (dataTable) {
 
   const cuilDoctor: Cuil = new Cuil("27123456789");
   const emailDoctor: Email = new Email(`${nombre.toLowerCase()}@example.com`);
-  doctor = new Doctor(cuilDoctor, nombre, apellido, emailDoctor, "DOC12345");
+  escenarioMedicoContexto.doctor = new Doctor(
+    cuilDoctor,
+    nombre,
+    apellido,
+    emailDoctor,
+    "DOC12345",
+  );
 
-  dbMockeada = new DBPruebaEnMemoria();
-  servicioUrgencias = new UrgenciaService(dbMockeada);
+  escenarioMedicoContexto.db = new DBPruebaEnMemoria();
+  escenarioMedicoContexto.servicioUrgencias = new UrgenciaService(
+    escenarioMedicoContexto.db,
+  );
   atencionRegistrada = null;
   excepcionEsperada = null;
 });
@@ -76,7 +83,7 @@ Given("que el siguiente ingreso esta registrado:", function (dataTable) {
     afiliado,
     domicilio,
   );
-  dbMockeada!.guardarPaciente(paciente);
+  escenarioMedicoContexto.db!.guardarPaciente(paciente);
 
   const enfermera: Enfermera = new Enfermera(
     new Cuil("27999999999"),
@@ -86,7 +93,7 @@ Given("que el siguiente ingreso esta registrado:", function (dataTable) {
     "ENF12345",
   );
 
-  servicioUrgencias!.registrarUrgencia({
+  escenarioMedicoContexto.servicioUrgencias!.registrarUrgencia({
     cuil: cuil.replace(/\D/g, ""),
     enfermera,
     informe,
@@ -98,7 +105,10 @@ Given("que el siguiente ingreso esta registrado:", function (dataTable) {
     frecuenciaDiastolica,
   });
 
-  servicioUrgencias!.reclamarPaciente(doctor!, cuil);
+  escenarioMedicoContexto.servicioUrgencias!.reclamarPaciente(
+    escenarioMedicoContexto.doctor!,
+    cuil,
+  );
 });
 
 When("El medico registra la atencion con el siguiente informe:", function (dataTable) {
@@ -109,14 +119,18 @@ When("El medico registra la atencion con el siguiente informe:", function (dataT
   excepcionEsperada = null;
 
   try {
-    atencionRegistrada = servicioUrgencias!.registrarAtencion(
-      doctor!,
+    atencionRegistrada = escenarioMedicoContexto.servicioUrgencias!.registrarAtencion(
+      escenarioMedicoContexto.doctor!,
       cuil,
       informe,
     );
   } catch (error) {
     excepcionEsperada = error as Error;
   }
+  mensajesContexto.ultimoMensaje = excepcionEsperada
+    ? excepcionEsperada.message
+    : null;
+  mensajesContexto.ultimoError = excepcionEsperada;
 });
 
 Then("se registra la atencion", function () {
@@ -124,27 +138,20 @@ Then("se registra la atencion", function () {
 });
 
 Then(
-  'el estado del ingreso del paciente con cuil:{string} pasa a ser "{string}"',
+  /^el estado del ingreso del paciente con cuil:([0-9-]+) pasa a ser "([^"]+)"$/,
   function (cuil: string, estado: string) {
-    const ingresos: Ingreso[] = servicioUrgencias!.obtenerIngresosDelDoctor(
-      doctor!.Email.Valor,
-    );
+    const ingresos: Ingreso[] =
+      escenarioMedicoContexto.servicioUrgencias!.obtenerIngresosDelDoctor(
+        escenarioMedicoContexto.doctor!.Email.Valor,
+      );
     const ingresoObjetivo = ingresos.find(
       (ingreso) => ingreso.CuilPaciente === cuil,
     );
     const estadoEsperado =
-      estado === "FINALIZADO" ? EstadoIngreso.FINALIZADO : estado;
+      estado === "FINALIZADO"
+        ? EstadoIngreso.FINALIZADO
+        : EstadoIngreso.EN_PROCESO;
     expect(ingresoObjetivo).to.not.be.undefined;
     expect(ingresoObjetivo!.Estado).to.equal(estadoEsperado);
   },
 );
-
-Then(
-  'el sistema muestra el siguiente mensaje de error: "{string}"',
-  function (mensaje: string) {
-    expect(excepcionEsperada).to.not.be.null;
-    expect(excepcionEsperada!.message).to.equal(mensaje);
-  },
-);
-
-
