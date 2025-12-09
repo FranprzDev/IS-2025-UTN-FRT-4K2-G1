@@ -30,6 +30,12 @@ export class AtencionController {
         res.status(400).json({ error: "Se debe indicar el CUIL del ingreso." });
         return;
       }
+      if (!informe || informe.trim() === "") {
+        res
+          .status(400)
+          .json({ error: "Se ha omitido el informe de la atención" });
+        return;
+      }
 
       const nombreDoctor: string =
         nombre?.trim() || user.email.split("@")[0] || "medico";
@@ -65,6 +71,34 @@ export class AtencionController {
       res.status(400).json({ error: errorMessage });
     }
   }
+
+  public async obtenerAtencionesDelDoctor(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    try {
+      const user = (req as any).user as JwtPayload;
+
+      if (!user || user.rol !== "medico") {
+        res
+          .status(403)
+          .json({ error: "Solo los médicos pueden ver sus atenciones." });
+        return;
+      }
+
+      const atenciones = this.urgenciaService.obtenerAtencionesDelDoctor(
+        user.email,
+      );
+      res.status(200).json(atenciones.map((atencion) => atencion.toJSON()));
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Error desconocido al obtener las atenciones";
+      res.status(400).json({ error: errorMessage });
+    }
+  }
 }
+
 
 

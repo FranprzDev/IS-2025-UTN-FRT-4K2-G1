@@ -14,7 +14,12 @@ export const crearAtencionRouter = (
     atencionController.registrarAtencion(req, res);
   });
 
+  router.get("/mis-atenciones", authMiddleware, (req, res) => {
+    atencionController.obtenerAtencionesDelDoctor(req, res);
+  });
+
   return router;
 };
+
 
 
