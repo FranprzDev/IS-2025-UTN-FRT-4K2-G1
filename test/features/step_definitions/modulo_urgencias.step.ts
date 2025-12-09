@@ -11,6 +11,7 @@ import { Afiliado } from "../../../src/models/afiliado.js";
 import { ObraSocial } from "../../../src/models/obraSocial.js";
 import { Domicilio } from "../../../src/models/domicilio.js";
 import { mensajesContexto } from "./sharedMessages.js";
+import "./shared_messages.step.js";
 
 let enfermera: Enfermera | null = null;
 let dbMockeada: DBPruebaEnMemoria | null = null;
@@ -151,8 +152,6 @@ Given("que el siguiente paciente esta registrado", function (dataTable) {
 });
 
 Given("que el paciente no existe en el sistema", function () { 
-  // No hacer nada, ya que el paciente no existe en el sistema
-  // Consultar al chelingo si lo podemos sacar directamente.
 });
 
 
