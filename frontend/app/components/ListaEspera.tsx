@@ -25,8 +25,10 @@ interface Ingreso {
 
 export default function ListaEspera({
   refreshTrigger,
+  onReclamoExitoso,
 }: {
   refreshTrigger: number;
+  onReclamoExitoso?: () => void;
 }) {
   const [ingresos, setIngresos] = useState<Ingreso[]>([]);
   const [userRole, setUserRole] = useState<string>("");
@@ -34,16 +36,12 @@ export default function ListaEspera({
   const [loadingCuil, setLoadingCuil] = useState<string>("");
   const [toastType, setToastType] = useState<"success" | "error">("success");
   const [ingresosAsignados, setIngresosAsignados] = useState<Ingreso[]>([]);
-  const [selectedIngresoCuil, setSelectedIngresoCuil] = useState<string>("");
   const [doctorData, setDoctorData] = useState({
     nombre: "",
     apellido: "",
     cuil: "",
     matricula: "",
   });
-  const [atencionCuil, setAtencionCuil] = useState<string>("");
-  const [atencionInforme, setAtencionInforme] = useState<string>("");
-  const [atencionLoading, setAtencionLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -126,12 +124,6 @@ export default function ListaEspera({
     [estadoEsEnProceso, ingresosAsignados],
   );
 
-  const ingresosEnProceso = useMemo(
-    () =>
-      ingresosAsignados.filter((ingreso) => estadoEsEnProceso(ingreso.estado)),
-    [estadoEsEnProceso, ingresosAsignados],
-  );
-
   const getNivelColor = (nivel: string) => {
     switch (nivel) {
       case "Critica":
@@ -146,6 +138,11 @@ export default function ListaEspera({
   };
 
   const handleReclamarPaciente = async (ingresoCuil?: string) => {
+    if (ingresos.length === 0) {
+      setToastType("error");
+      setMessage("No hay nadie en la lista de espera");
+      return;
+    }
     if (doctorOcupado) {
       setToastType("error");
       setMessage("Ya tienes un paciente en proceso");
@@ -156,10 +153,7 @@ export default function ListaEspera({
       setMessage("Debe iniciar sesión para reclamar");
       return;
     }
-    if (ingresoCuil) {
-      setSelectedIngresoCuil(ingresoCuil);
-    }
-    const objetivo = ingresoCuil || selectedIngresoCuil;
+    const objetivo = ingresoCuil || "";
     setLoadingCuil(objetivo);
     setMessage(`Reclamando paciente ${objetivo || ""}...`);
     setToastType("success");
@@ -174,7 +168,7 @@ export default function ListaEspera({
         },
         body: JSON.stringify({
           ...doctorData,
-          ingresoCuil: ingresoCuil || selectedIngresoCuil,
+          ingresoCuil: ingresoCuil,
         }),
       });
 
@@ -187,61 +181,14 @@ export default function ListaEspera({
       setToastType("success");
       await cargarIngresos();
       await cargarMisIngresos();
-      setSelectedIngresoCuil("");
+      if (onReclamoExitoso) {
+        onReclamoExitoso();
+      }
     } catch (err: any) {
       setToastType("error");
       setMessage("Error: " + err.message);
     }
     setLoadingCuil("");
-  };
-
-  const handleRegistrarAtencion = async () => {
-    if (!userRole) {
-      setToastType("error");
-      setMessage("Debe iniciar sesión para registrar la atención");
-      return;
-    }
-    if (!atencionCuil || atencionCuil.trim() === "") {
-      setToastType("error");
-      setMessage("Debe seleccionar un paciente en proceso");
-      return;
-    }
-    if (!atencionInforme || atencionInforme.trim() === "") {
-      setToastType("error");
-      setMessage("Debe completar el informe de atención");
-      return;
-    }
-    setAtencionLoading(true);
-    setToastType("success");
-    setMessage("Registrando atención...");
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch("/api/atencion/registrar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token || ""}`,
-        },
-        body: JSON.stringify({
-          ingresoCuil: atencionCuil,
-          informe: atencionInforme,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Error al registrar la atención");
-      }
-      setToastType("success");
-      setMessage("Atención registrada exitosamente");
-      setAtencionInforme("");
-      setAtencionCuil("");
-      await cargarIngresos();
-      await cargarMisIngresos();
-    } catch (err: any) {
-      setToastType("error");
-      setMessage("Error: " + err.message);
-    }
-    setAtencionLoading(false);
   };
 
   return (
@@ -264,7 +211,7 @@ export default function ListaEspera({
               onClick={() => handleReclamarPaciente()}
               className="btn btn-primary"
               style={{ padding: "0.5rem 1rem" }}
-              disabled={!!loadingCuil || doctorOcupado || ingresos.length === 0}
+              disabled={!!loadingCuil || doctorOcupado}
             >
               {loadingCuil
                 ? "Reclamando..."
@@ -421,118 +368,6 @@ export default function ListaEspera({
           </table>
         </div>
       </div>
-      {userRole === "medico" && (
-        <div className="card" style={{ marginTop: "1rem" }}>
-          <h3 className="title" style={{ fontSize: "1.5rem", margin: 0 }}>
-            Mis Pacientes en Atención
-          </h3>
-          <div style={{ overflowX: "auto", marginTop: "1rem" }}>
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                textAlign: "left",
-              }}
-            >
-              <thead>
-                <tr style={{ borderBottom: "1px solid var(--card-border)" }}>
-                  <th style={{ padding: "1rem" }}>Paciente</th>
-                  <th style={{ padding: "1rem" }}>CUIL</th>
-                  <th style={{ padding: "1rem" }}>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ingresosAsignados.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={3}
-                      style={{
-                        padding: "1rem",
-                        textAlign: "center",
-                        color: "var(--secondary)",
-                      }}
-                    >
-                      No tienes pacientes en atención
-                    </td>
-                  </tr>
-                ) : (
-                  ingresosAsignados.map((ingreso, i) => (
-                    <tr
-                      key={i}
-                      style={{ borderBottom: "1px solid var(--card-border)" }}
-                    >
-                      <td style={{ padding: "1rem" }}>
-                        {ingreso.paciente.nombre} {ingreso.paciente.apellido}
-                      </td>
-                      <td style={{ padding: "1rem" }}>
-                        {ingreso.paciente.cuil.valor}
-                      </td>
-                      <td style={{ padding: "1rem" }}>
-                        {ingreso.estado || "En proceso"}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-      {userRole === "medico" && ingresosEnProceso.length > 0 && (
-        <div className="card" style={{ marginTop: "1rem" }}>
-          <h3 className="title" style={{ fontSize: "1.5rem", margin: 0 }}>
-            Registrar Atención
-          </h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr",
-              gap: "0.75rem",
-              marginTop: "1rem",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-              <label style={{ fontWeight: 600 }}>Paciente en proceso</label>
-              <select
-                value={atencionCuil}
-                onChange={(e) => setAtencionCuil(e.target.value)}
-                style={{ padding: "0.65rem", borderRadius: "0.5rem", border: "1px solid var(--card-border)", background: "transparent", color: "var(--foreground)" }}
-              >
-                <option value="">Seleccionar</option>
-                {ingresosEnProceso.map((ingreso) => (
-                  <option key={ingreso.paciente.cuil.valor} value={ingreso.paciente.cuil.valor}>
-                    {ingreso.paciente.nombre} {ingreso.paciente.apellido} - {ingreso.paciente.cuil.valor}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-              <label style={{ fontWeight: 600 }}>Informe</label>
-              <textarea
-                value={atencionInforme}
-                onChange={(e) => setAtencionInforme(e.target.value)}
-                rows={4}
-                style={{
-                  padding: "0.75rem",
-                  borderRadius: "0.5rem",
-                  border: "1px solid var(--card-border)",
-                  background: "transparent",
-                  color: "var(--foreground)",
-                  resize: "vertical",
-                }}
-              />
-            </div>
-            <button
-              className="btn btn-primary"
-              onClick={handleRegistrarAtencion}
-              disabled={atencionLoading}
-              style={{ padding: "0.75rem", fontWeight: 600 }}
-            >
-              {atencionLoading ? "Registrando..." : "Registrar Atención"}
-            </button>
-          </div>
-        </div>
-      )}
       <style jsx>{`
         @keyframes spin {
           from {

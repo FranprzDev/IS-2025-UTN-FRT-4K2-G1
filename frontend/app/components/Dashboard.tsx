@@ -5,9 +5,11 @@ import PacienteForm from './PacienteForm';
 import UrgenciaForm from './UrgenciaForm';
 import ListaEspera from './ListaEspera';
 import UsuarioForm from './UsuarioForm';
+import AtencionesPanel from './AtencionesPanel';
+import PacientesLista from './PacientesLista';
 import { useRouter } from 'next/navigation';
 
-type Tab = 'registro' | 'urgencia' | 'lista' | 'usuarios';
+type Tab = 'registro' | 'urgencia' | 'lista' | 'usuarios' | 'atenciones' | 'pacientes';
 type Role = 'administrativo' | 'medico' | 'enfermera';
 
 const resolveRole = (role: string | undefined): Role => {
@@ -20,12 +22,13 @@ const resolveRole = (role: string | undefined): Role => {
 
 const getAllowedTabs = (role: Role): Tab[] => {
     if (role === 'medico') {
-        return ['lista'];
+        return ['lista', 'atenciones'];
     }
-    if (role === 'enfermera') {
+    console.log(role)
+    if (role === 'administrativo') {
         return ['registro', 'urgencia', 'lista'];
     }
-    return ['registro', 'urgencia', 'lista', 'usuarios'];
+    return ['registro', 'urgencia', 'lista', 'usuarios', 'pacientes', 'atenciones'];
 };
 
 export default function Dashboard() {
@@ -33,6 +36,7 @@ export default function Dashboard() {
     const [activeTab, setActiveTab] = useState<Tab>('registro');
     const [selectedCuil, setSelectedCuil] = useState('');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [atencionRefresh, setAtencionRefresh] = useState(0);
     const [userName, setUserName] = useState('Administrativo');
     const [userRole, setUserRole] = useState<Role>('administrativo');
 
@@ -72,6 +76,11 @@ export default function Dashboard() {
         setActiveTab('lista');
     };
 
+    const handleReclamoExitoso = () => {
+        setAtencionRefresh(prev => prev + 1);
+        setActiveTab('atenciones');
+    };
+
     return (
         <div className="dashboard-container">
             <aside className="sidebar">
@@ -104,6 +113,22 @@ export default function Dashboard() {
                             <span>📋</span> Lista de Espera
                         </button>
                     )}
+                    {allowedTabs.includes('atenciones') && (
+                        <button
+                            className={`nav-item ${activeTab === 'atenciones' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('atenciones')}
+                        >
+                            <span>🩺</span> Atenciones
+                        </button>
+                    )}
+                    {allowedTabs.includes('pacientes') && (
+                        <button
+                            className={`nav-item ${activeTab === 'pacientes' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('pacientes')}
+                        >
+                            <span>🗂️</span> Pacientes
+                        </button>
+                    )}
                     {allowedTabs.includes('usuarios') && (
                         <button
                             className={`nav-item ${activeTab === 'usuarios' ? 'active' : ''}`}
@@ -132,6 +157,8 @@ export default function Dashboard() {
                         {activeTab === 'registro' && 'Registro de Pacientes'}
                         {activeTab === 'urgencia' && 'Ingreso de Urgencia'}
                         {activeTab === 'lista' && 'Sala de Espera'}
+                        {activeTab === 'atenciones' && 'Atenciones'}
+                        {activeTab === 'pacientes' && 'Pacientes registrados'}
                         {activeTab === 'usuarios' && 'Gestión de Usuarios'}
                     </h1>
                     <div className="date-display">
@@ -154,13 +181,28 @@ export default function Dashboard() {
 
                     {activeTab === 'lista' && allowedTabs.includes('lista') && (
                         <div className="fade-in">
-                            <ListaEspera refreshTrigger={refreshTrigger} />
+                            <ListaEspera
+                                refreshTrigger={refreshTrigger}
+                                onReclamoExitoso={handleReclamoExitoso}
+                            />
+                        </div>
+                    )}
+
+                    {activeTab === 'atenciones' && allowedTabs.includes('atenciones') && (
+                        <div className="fade-in">
+                            <AtencionesPanel refreshTrigger={atencionRefresh} />
                         </div>
                     )}
 
                     {activeTab === 'usuarios' && allowedTabs.includes('usuarios') && (
                         <div className="fade-in">
                             <UsuarioForm onSuccess={() => {}} />
+                        </div>
+                    )}
+
+                    {activeTab === 'pacientes' && allowedTabs.includes('pacientes') && (
+                        <div className="fade-in">
+                            <PacientesLista />
                         </div>
                     )}
                 </div>
