@@ -60,6 +60,17 @@ const prepararAfiliacionSiCorresponde = (
   });
 };
 
+type DatosPaciente = {
+  cuil: string;
+  apellido: string;
+  nombre: string;
+  calle: string;
+  numero: string;
+  localidad: string;
+  nombreObraSocial?: string;
+  numeroAfiliado?: string;
+};
+
 const registrarPacienteDesdeTabla = (fila: Record<string, string>): void => {
   const domicilio = parsearDomicilio(fila["Domicilio"] || "");
   const nombreObraSocial: string | undefined =
@@ -82,17 +93,24 @@ const registrarPacienteDesdeTabla = (fila: Record<string, string>): void => {
     numeroAfiliado,
   );
 
+  const datosPaciente: DatosPaciente = {
+    cuil: cuilNormalizado,
+    apellido: fila["Apellido"] || "",
+    nombre: fila["Nombre"] || "",
+    calle: domicilio.calle,
+    numero: domicilio.numero,
+    localidad: domicilio.localidad,
+  };
+
+  if (nombreObraSocial) {
+    datosPaciente.nombreObraSocial = nombreObraSocial;
+  }
+  if (numeroAfiliado) {
+    datosPaciente.numeroAfiliado = numeroAfiliado;
+  }
+
   try {
-    ultimoPacienteRegistrado = pacienteService.registrarPaciente({
-      cuil: cuilNormalizado,
-      apellido: fila["Apellido"] || "",
-      nombre: fila["Nombre"] || "",
-      calle: domicilio.calle,
-      numero: domicilio.numero,
-      localidad: domicilio.localidad,
-      nombreObraSocial,
-      numeroAfiliado,
-    });
+    ultimoPacienteRegistrado = pacienteService.registrarPaciente(datosPaciente);
     excepcionPaciente = null;
   } catch (error) {
     ultimoPacienteRegistrado = null;
